@@ -11,22 +11,29 @@ INCLUDE BIBLIOTECA.LIB
     ;VARIABLE DE CONTROL PARA EL ID DEL ARCHIVO
     ID          dw 0
 
-    ;DEFINICI”N DE RUTAS (RAÕZ Y CARPETAS DE DEVICES)
-    ; --DANIEL BARRERA (CREACI”N DE RUTA RAÕZ)
-    ; Se usa la ruta base de tu proyecto previo
+    ;DEFINICI√ìN DE RUTAS (RA√çZ Y CARPETAS DE DEVICES)
+    ; --DANIEL BARRERA (CREACI√ìN DE RUTAS PRINCIPALES)
     raiz        db 'C:\PROY_ATLANTIC', 0
     dir_termo   db 'C:\PROY_ATLANTIC\TERMO', 0
     dir_motor   db 'C:\PROY_ATLANTIC\MOTOR', 0
     dir_leds    db 'C:\PROY_ATLANTIC\LEDS', 0
     dir_print   db 'C:\PROY_ATLANTIC\PRINT', 0
     dir_LCD     db 'C:\PROY_ATLANTIC\LCDDISPLAY', 0
+    dir_seven   db 'C:\PROY_ATLANTIC\SEVEN', 0
+    dir_dot     db 'C:\PROY_ATLANTIC\DOTMATRX', 0
+    dir_traffic  db 'C:\PROY_ATLANTIC\TRAFFIC', 0
+    dir_robot    db 'C:\PROY_ATLANTIC\ROBOT', 0
 
-    ; --- DefiniciÛn de Archivos TXT ---
-    file_termo  db 'C:\PROY_ATLANTIC\TERMO\termo.txt', 0
-    file_motor  db 'C:\PROY_ATLANTIC\MOTOR\motor.txt', 0
-    file_leds   db 'C:\PROY_ATLANTIC\LEDS\leds.txt', 0
-    file_print  db 'C:\PROY_ATLANTIC\PRINT\print.txt', 0
+    ; --- Definici√≥n de Archivos TXT ---
+    file_termo  db 'C:\PROY_ATLANTIC\TERMO\termo.txt', 0 ;ENCISO RAMIREZ (DESARROLLO DE TERMOMETRO)
+    file_motor  db 'C:\PROY_ATLANTIC\MOTOR\motor.txt', 0 ;HARO CANDELARIO (DESARROLLO DE MOTOR)
+    file_leds   db 'C:\PROY_ATLANTIC\LEDS\leds.txt', 0   ;HARO CANDELARIO (DESARROLLO DE LEDS)
+    file_print  db 'C:\PROY_ATLANTIC\PRINT\print.txt', 0 ;IBARRA GARCIA (DESARROLLO DE PRINT)
     file_LCD     db 'C:\PROY_ATLANTIC\LCDDISPLAY\lcd.txt', 0 ;DANIEL BARRERA (DESARROLLO DE LCD)
+    file_seven  db 'C:\PROY_ATLANTIC\SEVEN\seven.txt', 0 ;IBARRA GARCIA (SEVEN SEGMENT)
+    file_dot    db 'C:\PROY_ATLANTIC\DOTMATRX\dot.txt', 0 ;HARO CANDELARIO (DESARROLLO DE DOTMATRIX)
+    file_traffic db 'C:\PROY_ATLANTIC\TRAFFIC\traffic.txt', 0 ;ENCISO RAMIREZ (DESARROLLO DE TRAFFIC LIGHTS)
+    file_robot   db 'C:\PROY_ATLANTIC\ROBOT\robot.txt', 0 ;HARO CANDELARIO (DESARROLLO DE ROBOT)
 
     ; --- Contenido de los Archivos (Descripciones del Invernadero) ---
     msg_termo   db 'DEVICE: Termometro. USO: Monitoreo de temperatura para activacion de extractores. $'
@@ -44,6 +51,18 @@ INCLUDE BIBLIOTECA.LIB
     msg_lcd     db 'DEVICE: LCD Display. USO: Registro y control de inventario de insumos del invernadero. $'
     len_lcd     dw 88
 
+    msg_seven   db 'DEVICE: Seven Segment. USO: Visualizacion de temperatura actual y temporizadores de riego. $'
+    len_seven   dw 90
+
+    msg_dot     db 'DEVICE: Dot Matrix. USO: Interfaz grafica para mostrar iconos de estado ambiental y alertas de texto dinamico. $'
+    len_dot     dw 110
+
+    msg_traffic  db 'DEVICE: Traffic Lights. USO: Control de semaforos para el area de carga y descarga. $'
+    len_traffic  dw 83
+
+    msg_robot    db 'DEVICE: Robot. USO: Brazo articulado para seleccion y empaque de producto terminado. $'
+    len_robot    dw 84
+
     ; --- Mensajes de Interfaz ---
     msj_inicio  db 'Iniciando creacion de infraestructura Invernadero Atlantic Corp...', '$'
     msj_fin     db 10, 13, 'Sistema de archivos creado con exito.$'
@@ -60,10 +79,10 @@ INICIO:
     IMP_CAD_SINCOLOR msj_inicio
 
     ; ==========================================================
-    ; 1.- CREACI”N DE CARPETAS (Directorios)
+    ; 1.- CREACI√ìN DE CARPETAS (Directorios)
     ; ==========================================================
     
-    ; CREAR RAÕZ
+    ; CREAR RA√çZ
     CREAR_CARPETA raiz
     
     ; Crear Subcarpetas de Dispositivos
@@ -72,27 +91,31 @@ INICIO:
     CREAR_CARPETA dir_leds
     CREAR_CARPETA dir_print
     CREAR_CARPETA dir_LCD
+    CREAR_CARPETA dir_seven
+    CREAR_CARPETA dir_dot
+    CREAR_CARPETA dir_traffic
+    CREAR_CARPETA dir_robot
 
     ; ==========================================================
-    ; 2.- CREACI”N DE ARCHIVOS Y ESCRITURA DE USOS
+    ; 2.- CREACI√ìN DE ARCHIVOS Y ESCRITURA DE USOS
     ; ==========================================================
     
-    ; --- TERMOMETRO ---
+    ; --- TERMOMETRO --- ENCISO RAMIREZ
     CREAR_ARCHIVO file_termo, 32   
     ESCRIBIR_ARCHIVO ID, len_termo, msg_termo
     CERRAR_ARCHIVO ID
 
-    ; --- MOTOR ---
+    ; --- MOTOR --- HARO CANDELARIO
     CREAR_ARCHIVO file_motor, 32
     ESCRIBIR_ARCHIVO ID, len_motor, msg_motor
     CERRAR_ARCHIVO ID
 
-    ; --- LEDS ---
+    ; --- LEDS --- HARO CANDELARIO
     CREAR_ARCHIVO file_leds, 32
     ESCRIBIR_ARCHIVO ID, len_leds, msg_leds
     CERRAR_ARCHIVO ID
 
-    ; --- IMPRESORA ---
+    ; --- IMPRESORA --- IBARRA GARCIA
     CREAR_ARCHIVO file_print, 32
     ESCRIBIR_ARCHIVO ID, len_print, msg_print
     CERRAR_ARCHIVO ID
@@ -102,7 +125,27 @@ INICIO:
     ESCRIBIR_ARCHIVO ID, len_lcd, msg_lcd
     CERRAR_ARCHIVO ID
 
-    ; DETECCI”N DE ERRORES
+    ; --- Seven Segment --- IBARRA GARCIA
+    CREAR_ARCHIVO file_seven, 32
+    ESCRIBIR_ARCHIVO ID, len_seven, msg_seven
+    CERRAR_ARCHIVO ID
+
+    ; --- DOT MATRIX --- HARO CANDELARIO
+    CREAR_ARCHIVO file_dot, 32
+    ESCRIBIR_ARCHIVO ID, len_dot, msg_dot
+    CERRAR_ARCHIVO ID
+
+    ; --- Traffic Lights --- ENCISO RAMIREZ
+    CREAR_ARCHIVO file_traffic, 32
+    ESCRIBIR_ARCHIVO ID, len_traffic, msg_traffic
+    CERRAR_ARCHIVO ID
+
+    ; --- Robot --- HARO CANDELARIO
+    CREAR_ARCHIVO file_robot, 32
+    ESCRIBIR_ARCHIVO ID, len_robot, msg_robot
+    CERRAR_ARCHIVO ID
+
+    ; DETECCI√ìN DE ERRORES
     JC ERROR_SISTEMA
 
     ; Mensaje final
