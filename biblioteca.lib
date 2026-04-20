@@ -2,6 +2,46 @@
 ; ATLANTIC CORP
 ;_______________________________
 
+    enca1       db '    ___   __  __            __  _                              '
+    enca2       db '   /   | / /_/ /___ _____  / /_(_)____   _________  _________  '
+    enca3       db '  / /| |/ __/ / __ `/ __ \/ __/ / ___/  / ___/ __ \/ ___/ __ \ '
+    enca4       db ' / ___ / /_/ / /_/ / / / / /_/ / /__   / /__/ /_/ / /  / /_/ / '
+    enca5       db '/_/  |_\__/_/\__,_/_/ /_/\__/_/\___/   \___/\____/_/  / .___(_)'
+    enca6       db '                                                     /_/       '
+    
+    p1 db ' \|/ '
+    p2 db '--X--'
+    p3 db ' /|\ '
+    p4 db '[___]'
+
+                     
+     imp_color macro msj, long, fil, col 
+        mov ah, 19
+        lea bp, msj
+        mov cx, long
+        mov dh, fil
+        mov dl, col
+        mov bh, 0
+        mov al, 0
+        mov bl, 21h
+        int 10h
+           
+     imp_color endm
+     
+     encabezado macro
+        imp_color enca1, 63, 0, 0
+        imp_color enca2, 63, 1, 0
+        imp_color enca3, 63, 2, 0
+        imp_color enca4, 63, 3, 0
+        imp_color enca5, 63, 4, 0
+        imp_color enca6, 63, 5, 0
+        
+        imp_color p1, 5, 0, 65
+        imp_color p2, 5, 1, 65
+        imp_color p3, 5, 2, 65
+        imp_color p4, 5, 3, 65   
+     encabezado endm
+
 CURSOR MACRO REN,COL,PAG
     MOV AH,2
     MOV DH,REN
