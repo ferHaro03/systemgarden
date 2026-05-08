@@ -1,0 +1,14 @@
+# Archivos de compilacion de Emu8086
+*.exe
+*.com
+*.bin
+*.obj
+*.lst
+*.map
+*.symbol
+
+# Ignorar las carpetas virtuales que crea el emulador en tiempo de ejecucion
+# (Para que no se suban los txt que genera el programa al correr)
+/vdrive/
+*.txt
+!README.txt
