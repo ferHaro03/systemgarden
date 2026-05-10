@@ -1,10 +1,4 @@
 ;libreria print
-    msjAnomalia db 'Se ha detectado una anomalia', 10,13
-    msjRevCult  db 'Es necesario revisar las plantaciones', 10,13
-    msjRevVent  db 'Es necesario revisar la ventilacion', 10,13
-    msjRevFuga  db 'Se ha detectado una fuga de calor', 10,13
-    msjPeligro  db 'Cultivos en peligro, revisar pronto', 10,13
-    
     manomalia macro
         mov cx, 30              
         mov si, 0
