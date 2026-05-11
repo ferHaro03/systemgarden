@@ -4,55 +4,45 @@
 
 MODULO_LOGIN PROC
     ; --- 1. DIBUJAR MARGEN GENERAL ---
-    CURSOR 1, 1, 0
-    IMP_SINCOLOR marco_sup
+    LIMPIAR_PANTALLA 07H
+    
+    ; Orden: CADENA, LONGITUD, PAGINA, MODO, REN(Y), COL(X), COLOR
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
     
     MOV CX, 23    
     MOV DH, 1     
 dibujar_lados_log:
-    CURSOR DH, 1, 0
-    MOV AH, 02H
-    MOV DL, 186     ; Borde izquierdo '¦'
-    INT 21H
-    CURSOR DH, 78, 0
-    MOV AH, 02H
-    MOV DL, 186     ; Borde derecho '¦'
-    INT 21H
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
     INC DH        
     LOOP dibujar_lados_log
     
-    CURSOR 24, 1, 0
-    IMP_SINCOLOR marco_inf
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
 
     ; --- 2. DIBUJAR PORTADA "GARDEN" ---
-    CURSOR 2, 34, 0
-    IMP_SINCOLOR txt_sys
-    CURSOR 3, 30, 0
-    IMP_SINCOLOR txt_acc
+    IMP_COLOR txt_sys, 11, 0, 0, 2, 34, 0AH
+    IMP_COLOR txt_acc, 19, 0, 0, 3, 30, 0AH
     
-    CURSOR 5, 16, 0
-    IMP_SINCOLOR art_g1
-    CURSOR 6, 16, 0
-    IMP_SINCOLOR art_g2
-    CURSOR 7, 16, 0
-    IMP_SINCOLOR art_g3
-    CURSOR 8, 16, 0
-    IMP_SINCOLOR art_g4
-    CURSOR 9, 16, 0
-    IMP_SINCOLOR art_g5
+    IMP_COLOR art_g1, 48, 0, 0, 5, 16, 0AH
+    IMP_COLOR art_g2, 48, 0, 0, 6, 16, 0AH
+    IMP_COLOR art_g3, 48, 0, 0, 7, 16, 0AH
+    IMP_COLOR art_g4, 48, 0, 0, 8, 16, 0AH
+    IMP_COLOR art_g5, 48, 0, 0, 9, 16, 0AH
 
-    CURSOR 11, 19, 0
-    IMP_SINCOLOR txt_eqp
+    IMP_COLOR txt_eqp, 41, 0, 0, 11, 19, 0FH
 
     ; --- 3. CAPTURA DE USUARIO ---
-    CURSOR 15, 28, 0
-    IMP_SINCOLOR prompt_usr_log  
+    IMP_COLOR prompt_usr_log, 13, 0, 0, 15, 28, 0EH
+    
+    CURSOR 15, 41, 0       ; Posicionar el cursor justo despues del prompt
     LECTURA_CADENA buff_usr
     
     ; --- 4. CAPTURA DE CONTRASEÑA ---
-    CURSOR 17, 28, 0
-    IMP_SINCOLOR prompt_pwd_log  
+    IMP_COLOR prompt_pwd_log, 13, 0, 0, 17, 28, 0EH
     
+    CURSOR 17, 41, 0       ; Posicionar el cursor para los asteriscos
     MOV CX, 0              
     LEA BX, buff_pwd + 2   
 
@@ -65,7 +55,7 @@ captura_pass:
     INC BX                 
     INC CX                 
     
-    MOV AH, 02H            
+    MOV AH, 02H            ; Imprimir asterisco
     MOV DL, '*'            
     INT 21H                
     JMP captura_pass       
@@ -98,17 +88,22 @@ fin_pass:
     JNE error_login
 
     ; --- 6. ACCESO CONCEDIDO ---
-    CURSOR 20, 28, 0
-    IMP_SINCOLOR msg_valido
-    ; <-- Aquí más adelante agregaremos el menú principal de SystemGarden
+    IMP_COLOR msg_valido, 23, 0, 0, 20, 28, 0AH  ; Verde Claro
+    
+    ; Pequeña pausa antes de saltar al menú para que el usuario vea el "[OK]"
+    CURSOR 24, 79, 0 
+    RASTREO
+    
+    CALL MENU_PRINCIPAL
     RET
 
 error_login:
     ; --- 7. ACCESO DENEGADO ---
-    CURSOR 20, 20, 0
-    IMP_SINCOLOR msg_err
+    IMP_COLOR msg_err, 39, 0, 0, 20, 20, 0CH     ; Rojo Claro
+    
+    ; Pausa para leer el error y luego reiniciar el proceso de login
+    CURSOR 24, 79, 0
     RASTREO 
-    ; Limpiar los buffers si queremos que reintente (opcional para despues)
-    RET
+    JMP MODULO_LOGIN
     
 MODULO_LOGIN ENDP
