@@ -1,0 +1,27 @@
+;Libreria de robotica
+        
+    avanzar macro
+      mov al, 1
+      out 9, al
+      mov al, 0
+      out 9, al        
+    avanzar endm
+    
+    girarDerecha macro
+        mov al, 3
+        out 9, al
+        mov al, 0
+        out 9, al 
+    girarDerecha endm
+    
+    girarIzquierda macro
+        mov al, 2
+        out 9, al 
+        mov al, 0
+        out 9, al 
+    girarIzquierda endm
+
+    
+
+mov ah, 01h
+int 21h          ; el carácter leído queda en A

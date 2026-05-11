@@ -1,0 +1,76 @@
+;libreria print
+    manomalia macro
+        mov cx, 30              
+        mov si, 0
+        
+        cicloAnomalia:
+            impresion msjAnomalia[si]
+            inc si
+            loop cicloAnomalia
+    manomalia endm        
+    
+    mrevcult macro
+        mov cx, 39              
+        mov si, 0
+        
+        cicloRevCult:
+            impresion msjRevCult[si]
+            inc si
+            loop cicloRevCult
+    mrevcult endm
+    
+    mrevvent macro
+        mov cx, 37              
+        mov si, 0
+        
+        ciclovent:
+            impresion msjRevVent[si]
+            inc si
+            loop ciclovent
+    mrevvent endm
+        
+    mrevfuga macro
+        mov cx, 35              
+        mov si, 0
+        
+        ciclofug:
+            impresion msjRevFuga[si]
+            inc si
+            loop ciclofug
+    mrevfuga endm
+    
+    mpeligro macro
+        mov cx, 37              
+        mov si, 0
+        
+        ciclopeligro:
+            impresion msjPeligro[si]
+            inc si
+            loop ciclopeligro
+    mpeligro endm
+    
+    impresion macro caracter 
+            mov ah, 5
+            mov dl, caracter[si]
+            int 21h 
+    impresion endm 
+    
+    imp_sincolor macro cadena
+           mov ah, 9
+           lea dx, cadena
+           int 21h
+    imp_sincolor endm 
+    
+    cursor macro ren, col, pag
+           mov ah, 2
+           mov dh, ren
+           mov dl, col
+           mov bh, pag
+           int 10h
+    cursor endm   
+    
+    leerCaracter macro caracter
+        mov ah, 1
+        int 21h
+        mov caracter, al 
+    leerCaracter endm
