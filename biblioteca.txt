@@ -1,0 +1,137 @@
+; ===== BIBLIOTECA DE MACROS =====
+; ===== PARRA URIAS MA ELENA =====
+
+;=============== SECCIÓN DE MACROS ================= 
+CURSOR   MACRO  REN,COL,PAG
+       MOV AH,2
+       MOV DH,REN
+       MOV DL,COL
+       MOV BH,PAG
+       INT 10H
+CURSOR   ENDM    
+
+IMP_SINCOLOR MACRO CADENA
+       MOV AH,9
+       LEA DX,CADENA
+       INT 21H
+IMP_SINCOLOR ENDM 
+
+RASTREO MACRO
+        MOV AH,0
+        INT 16H
+RASTREO ENDM 
+
+IMPRIMIR MACRO CARACTER 
+        MOV AH,5
+        MOV DL,CARACTER
+        INT 21H
+IMPRIMIR ENDM  
+
+NEWPAGE  MACRO
+         MOV AH,5
+         MOV DL,12
+         INT 21H
+NEWPAGE  ENDM 
+
+LIMPIAR_PANTALLA MACRO
+    MOV AX, 0600H  ; AH=06 (Scroll/Limpiar), AL=00 (Toda la pantalla)
+    MOV BH, 07H    ; Atributo de color: 0=Fondo Negro, 7=Texto Blanco
+    MOV CX, 0000H  ; Esquina superior izquierda (Fila 0, Columna 0)
+    MOV DX, 184FH  ; Esquina inferior derecha (Fila 24, Columna 79 en Hex)
+    INT 10H
+    
+    ; Opcional: Regresar el cursor oculto a la coordenada 0,0
+    MOV AH, 02H
+    MOV BH, 00H
+    MOV DX, 0000H
+    INT 10H
+LIMPIAR_PANTALLA ENDM
+
+LECTURA_CADENA MACRO CADENA
+	MOV AH,10
+	LEA DX,CADENA
+	INT 21H
+LECTURA_CADENA ENDM
+
+IMP_COLOR MACRO CADENA,LONGITUD,PAGINA,MODO,REN,COL,COLOR
+	MOV AH,19
+	LEA BP,CADENA
+	MOV CX,LONGITUD
+	MOV DH,REN
+	MOV DL,COL
+	MOV AL,MODO
+	MOV BH,PAGINA
+	MOV BL,COLOR
+	INT 10H
+IMP_COLOR ENDM
+;===== MACROS DE ARCHIVOS Y CARPETAS
+
+
+CREAR_DIRECTORIO MACRO RUTA
+         MOV AH,39H  
+         LEA DX,RUTA
+         INT 21H
+CREAR_DIRECTORIO ENDM  
+
+
+CREAR_ARCHIVO MACRO RUTA,TIPO
+        MOV AH,3CH
+        LEA DX,RUTA
+        MOV CX,TIPO
+        INT 21H
+               MOV ID,AX ; RECUPERAR ID
+CREAR_ARCHIVO ENDM 
+
+ABRIR_ARCHIVO MACRO RUTA,MODO
+            ; MODO 
+                ;0 -solo lectura 
+                ;1- solo escritura
+                ;2- lectura/escritura
+                
+           MOV AH,3DH
+           MOV AL,MODO
+           LEA DX,RUTA
+           INT 21H
+    
+ABRIR_ARCHIVO ENDM  
+
+CERRAR_ARCHIVO MACRO ID
+            MOV AH,3EH
+            MOV BX,ID
+            INT 21H
+CERRAR_ARCHIVO ENDM  
+
+ESCRIBIR_ARCHIVO MACRO ID,CANTIDAD,DATOS
+    MOV AH,40H
+    MOV BX,ID
+    MOV CX,CANTIDAD
+    LEA DX,DATOS
+    INT 21H
+    
+ESCRIBIR_ARCHIVO ENDM   
+
+
+LEER_ARCHIVO    MACRO ID,CANTIDAD,LEIDOS
+            MOV AH,3FH
+            MOV CX,CANTIDAD
+            MOV BX,ID
+            LEA DX,LEIDOS
+            INT 21H
+LEER_ARCHIVO    ENDM
+
+BORRAR_SECCION MACRO COLOR,REN1,COL1,REN2,COL2
+	MOV AH, 06H
+    	MOV AL, 00H
+    	MOV BH, COLOR
+    	MOV CH, REN1  ; ESQ SUPERIOR IZQ
+	MOV CL, COL1
+    	MOV DH, REN2  ; ESQ INF DERECHA
+	MOV DL, COL2
+    	INT 10H
+BORRAR_SECCION ENDM
+
+
+
+
+;======================================FIN MACROS=== 
+
