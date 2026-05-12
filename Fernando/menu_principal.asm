@@ -60,7 +60,7 @@ modulo_daniel:
     JMP menu_inicio     
 
 modulo_enciso:
-    ; CALL MODULO_CLIMA
+    CALL MODULO_CLIMA
     JMP menu_inicio
 
 modulo_victor:
