@@ -136,6 +136,14 @@ MOVER_PUNTERO MACRO HANDLE, MODO
 ENDM
 
 
+FONDO_COLOR MACRO COLOR,FILL
+    MOV AH,09H
+    MOV AL,FILL
+    MOV BH,00H
+    MOV BL,COLOR
+    MOV CX,2100
+    INT 10H
+ENDM
 
 ;======================================FIN MACROS=== 
 

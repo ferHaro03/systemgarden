@@ -56,8 +56,8 @@ seleccionar:
     JMP seleccionar         ; Bucle infinito si presiona una tecla incorrecta
 
 modulo_daniel:
-    ; CALL MODULO_INVENTARIO
-    JMP menu_inicio
+    CALL PROCESO_DANIEL  
+    JMP menu_inicio     
 
 modulo_enciso:
     ; CALL MODULO_CLIMA
