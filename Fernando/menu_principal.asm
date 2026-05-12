@@ -79,21 +79,3 @@ salir_sistema:
     IMP_COLOR msg_salida, 20, 0, 0, 12, 30, 0CH  ; Rojo Claro
     RET                     
 MENU_PRINCIPAL ENDP
-
-VISUALIZAR_LOGS PROC
-    LIMPIAR_PANTALLA 0AH
-    CURSOR 2, 5, 0
-    IMP_SINCOLOR txt_acc ; Reutilizamos el header de "// ACCESS PORTAL //"
-    
-    CURSOR 5, 5, 0
-    ; --- Aquí irá la lógica de LECTURA_ARCHIVO ---
-    ; Por ahora, imprimimos un placeholder
-    MOV AH, 09H
-    ; LEA DX, buffer_lectura_archivo
-    ; INT 21H
-    
-    CURSOR 22, 5, 0
-    IMP_SINCOLOR msjPausa
-    RASTREO
-    RET
-VISUALIZAR_LOGS ENDP

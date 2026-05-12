@@ -4,91 +4,99 @@
 ; ====================================
 
 MODULO_BOOT PROC
-    LIMPIAR_PANTALLA
-    ; 1. Textos Superiores
-    CURSOR 2, 34, 0
-    IMP_SINCOLOR txt_sys
+    ; Limpiar con fondo negro
+    LIMPIAR_PANTALLA 07H
     
-    CURSOR 3, 30, 0
-    IMP_SINCOLOR txt_acc
+    ; --- 1. DIBUJAR MARGEN (Verde Oscuro 02H) ---
+    ; Orden: CADENA, LONGITUD, PAGINA, MODO, REN(Y), COL(X), COLOR
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
     
-    ; 2. Adornos laterales superiores (opcional, como en tu imagen)
-    CURSOR 6, 13, 0
-    IMP_SINCOLOR adorno_i
-    CURSOR 6, 67, 0
-    IMP_SINCOLOR adorno_d
+    MOV CX, 23    
+    MOV DH, 1     
+dibujar_lados_boot:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH        
+    LOOP dibujar_lados_boot
     
-    ; 3. Bloque GARDEN (Centrado en la columna 16)
-    CURSOR 7, 16, 0
-    IMP_SINCOLOR art_g1
-    CURSOR 8, 16, 0
-    IMP_SINCOLOR art_g2
-    CURSOR 9, 16, 0
-    IMP_SINCOLOR art_g3
-    CURSOR 10, 16, 0
-    IMP_SINCOLOR art_g4
-    CURSOR 11, 16, 0
-    IMP_SINCOLOR art_g5
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
 
-    ; 4. Adornos laterales inferiores
-    CURSOR 12, 10, 0
-    IMP_SINCOLOR adorno_i
-    CURSOR 12, 70, 0
-    IMP_SINCOLOR adorno_d
-
-    ; 5. Textos Inferiores y Autores
-    CURSOR 13, 23, 0
-    IMP_SINCOLOR txt_ver
+    ; --- 2. DISEÑO VISUAL (Verde Claro 0AH) ---
+    IMP_COLOR txt_sys, 11, 0, 0, 2, 34, 0AH
+    IMP_COLOR txt_acc, 19, 0, 0, 3, 30, 0AH
     
-    CURSOR 15, 15, 0
-    IMP_SINCOLOR txt_zig
+    ; Adornos
+    IMP_COLOR adorno_i, 1, 0, 0, 6, 13, 0AH
+    IMP_COLOR adorno_d, 1, 0, 0, 6, 67, 0AH
     
-    CURSOR 16, 19, 0
-    IMP_SINCOLOR txt_eqp
+    ; Logo GARDEN
+    IMP_COLOR art_g1, 48, 0, 0, 5, 16, 0AH
+    IMP_COLOR art_g2, 48, 0, 0, 6, 16, 0AH
+    IMP_COLOR art_g3, 48, 0, 0, 7, 16, 0AH
+    IMP_COLOR art_g4, 48, 0, 0, 8, 16, 0AH
+    IMP_COLOR art_g5, 48, 0, 0, 9, 16, 0AH
 
-    ; --- Crear directorios + status ---
+    IMP_COLOR adorno_i, 1, 0, 0, 12, 10, 0AH
+    IMP_COLOR adorno_d, 1, 0, 0, 12, 70, 0AH
+
+    ; Textos de Version y Equipo (Blanco 0FH y Verde 02H)
+    IMP_COLOR txt_ver, 33, 0, 0, 13, 23, 0FH
+    IMP_COLOR txt_zig, 50, 0, 0, 15, 15, 02H
+    IMP_COLOR txt_eqp, 41, 0, 0, 16, 19, 0FH
+
+    ; --- 3. CREAR DIRECTORIOS + STATUS (Verde 02H) ---
+    ; Usamos JNC para saltar si se crea bien, o CMP para ignorar si ya existe
+    
     CREAR_DIRECTORIO rutaRaiz
-    JNC dir_fer
+    JNC ok_r
     CMP AX, 05H
     JNE BOOT_ERR
-    CURSOR 19, 10, 0    IMP_SINCOLOR ok_raiz
+ok_r:
+    IMP_COLOR ok_raiz, 20, 0, 0, 18, 10, 02H
 
-dir_fer:
     CREAR_DIRECTORIO rutaFer
-    JNC dir_dan
+    JNC ok_f
     CMP AX, 05H
     JNE BOOT_ERR
-    CURSOR 20, 10, 0    IMP_SINCOLOR ok_fer
+ok_f:
+    IMP_COLOR ok_fer, 19, 0, 0, 19, 10, 02H
 
-dir_dan:
     CREAR_DIRECTORIO rutaDan
-    JNC dir_enc
+    JNC ok_d
     CMP AX, 05H
     JNE BOOT_ERR
-    CURSOR 21, 10, 0    IMP_SINCOLOR ok_dan
+ok_d:
+    IMP_COLOR ok_dan, 17, 0, 0, 20, 10, 02H
 
-dir_enc:
     CREAR_DIRECTORIO rutaEnc
-    JNC dir_vic         ; Si no hay error (Carry=0), salta a crear la siguiente
-    CMP AX, 05H         ; Si hay error, comparamos si es 05H (Ya existe)
-    JNE BOOT_ERR        ; Si es diferente de 05H, hubo un problema real, salta a ERROR
-    CURSOR 22, 10, 0    IMP_SINCOLOR ok_enc
-
-dir_vic:
-    CREAR_DIRECTORIO rutaVic
+    JNC ok_e
     CMP AX, 05H
     JNE BOOT_ERR
-    CURSOR 23, 0, 0    IMP_SINCOLOR ok_vic
+ok_e:
+    IMP_COLOR ok_enc, 17, 0, 0, 21, 10, 02H
 
-    ; --- Pausa (col 27, amarillo 0Eh) ---
-    CURSOR 24, 27, 0
-    IMP_SINCOLOR msg_paus
+    CREAR_DIRECTORIO rutaVic
+    JNC ok_v
+    CMP AX, 05H
+    JNE BOOT_ERR
+ok_v:
+    IMP_COLOR ok_vic, 17, 0, 0, 22, 10, 02H
+    
+
+    CREAR_ARCHIVO file_log,0   
+    MOV handle_log, AX
+    CERRAR_ARCHIVO handle_log
+    
+    ; --- PAUSA FINAL (Amarillo 0EH) ---
+    IMP_COLOR msg_paus, 27, 0, 0, 23, 27, 0EH
     RASTREO
     RET
 
 BOOT_ERR:
-    CURSOR 23, 0, 0
-    IMP_SINCOLOR msg_err
+    ; Mostrar error fatal en Rojo (0CH)
+    IMP_COLOR msg_err, 45, 0, 0, 23, 10, 0CH
     RASTREO
     MOV AX, 4C01H
     INT 21H

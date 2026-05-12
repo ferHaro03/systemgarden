@@ -74,32 +74,26 @@ CREAR_DIRECTORIO MACRO RUTA
 CREAR_DIRECTORIO ENDM  
 
 
-CREAR_ARCHIVO MACRO RUTA,TIPO
-        MOV AH,3CH
-        LEA DX,RUTA
-        MOV CX,TIPO
-        INT 21H
-               MOV ID,AX ; RECUPERAR ID
+CREAR_ARCHIVO MACRO RUTA, TIPO
+    MOV AH, 3CH
+    LEA DX, RUTA
+    MOV CX, TIPO
+    INT 21H
+    ; AX ahora contiene el identificador (handle) automáticamente 
 CREAR_ARCHIVO ENDM 
 
-ABRIR_ARCHIVO MACRO RUTA,MODO
-            ; MODO 
-                ;0 -solo lectura 
-                ;1- solo escritura
-                ;2- lectura/escritura
-                
-           MOV AH,3DH
-           MOV AL,MODO
-           LEA DX,RUTA
-           INT 21H
-    
+ABRIR_ARCHIVO MACRO RUTA, MODO
+    MOV AH, 3DH
+    MOV AL, MODO
+    LEA DX, RUTA
+    INT 21H
 ABRIR_ARCHIVO ENDM  
 
-CERRAR_ARCHIVO MACRO ID
-            MOV AH,3EH
-            MOV BX,ID
-            INT 21H
-CERRAR_ARCHIVO ENDM  
+CERRAR_ARCHIVO MACRO ID_VAR
+    MOV AH, 3EH
+    MOV BX, ID_VAR
+    INT 21H
+CERRAR_ARCHIVO ENDM
 
 ESCRIBIR_ARCHIVO MACRO ID,CANTIDAD,DATOS
     MOV AH,40H
@@ -130,6 +124,16 @@ BORRAR_SECCION MACRO COLOR,REN1,COL1,REN2,COL2
     	INT 10H
 BORRAR_SECCION ENDM
 
+; --- MACRO: MOVER PUNTERO DE ARCHIVO ---
+; MODO: 00h (Inicio), 01h (Actual), 02h (Final)
+MOVER_PUNTERO MACRO HANDLE, MODO
+    MOV AH, 42H
+    MOV AL, MODO    ; Asegúrate de que MODO sea un número (00h, 01h, 02h)
+    MOV BX, HANDLE
+    MOV CX, 0
+    MOV DX, 0
+    INT 21H
+ENDM
 
 
 

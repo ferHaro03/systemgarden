@@ -88,8 +88,20 @@ fin_pass:
     JNE error_login
 
     ; --- 6. ACCESO CONCEDIDO ---
-    IMP_COLOR msg_valido, 23, 0, 0, 20, 28, 0AH  ; Verde Claro
+    ; 1. Abrir
+    ABRIR_ARCHIVO file_log, 2  ; Usando tu macro: RUTA, MODO [cite: 10, 11]
+    MOV handle_log, AX
     
+    ; 2. Mover puntero (Usando interrupción directa ya que no hay macro SEEK)
+    MOVER_PUNTERO handle_log,02H
+    
+    ; 3. Escribir
+    ; Usando tu macro: ESCRIBIR_ARCHIVO ID, CANTIDAD, DATOS 
+    ESCRIBIR_ARCHIVO handle_log, 25, log_entry
+    
+    ; 4. Cerrar
+    CERRAR_ARCHIVO handle_log
+
     ; Pequeña pausa antes de saltar al menú para que el usuario vea el "[OK]"
     CURSOR 24, 79, 0 
     RASTREO
