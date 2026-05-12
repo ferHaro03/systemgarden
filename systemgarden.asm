@@ -37,7 +37,7 @@ INCLUDE biblioteca.txt
     msg_paus db '   Presiona cualquier tecla...$'             
     
     ; ====================================================
-    ; --- 3. DISEÑO VISUAL COMPARTIDO (Boot, Login, Menu) ---
+    ; --- 3. DISEÃ‘O VISUAL COMPARTIDO (Boot, Login, Menu) ---
     ; ====================================================
     marco_sup  db 201, 76 dup(205), 187, '$'
     marco_inf  db 200, 76 dup(205), 188, '$'
@@ -110,12 +110,12 @@ INCLUDE biblioteca.txt
     rob_msg1    db ' [!] Motor Stepper activado...      ' ; 36 letras
     rob_msg2    db ' [!] Robot en movimiento...         ' ; 36 letras
 
-    ; --- CONFIGURACIÓN DE SEGUNDO ARCHIVO ---
+    ; --- CONFIGURACIÃ“N DE SEGUNDO ARCHIVO ---
     file_sensores  db 'C:\SYSTGARD\FERNANDO\sensores.txt', 0
     handle_sens    dw ?
 
     ; Datos a manipular (ejemplo: Temperatura y Humedad)
-    ; Usamos 10 bytes para que sea fácil de leer/escribir
+    ; Usamos 10 bytes para que sea fÃ¡cil de leer/escribir
     msg_temp       db 'TEMP: 25C ', 13, 10 ; 12 bytes
     msg_hum        db 'HUM:  60% ', 13, 10 ; 12 bytes
     msg_imp       db ' [!] Enviando reporte a impresora...', '$'
@@ -130,10 +130,10 @@ INCLUDE biblioteca.txt
     OP3_INV         DB  'SALIR (3)'
     OPDB_INV        DB  2,1,3 DUP('$')
     MSJPRUEBA       DB  'ESTO ES UNA PRUEBA                     $'
-    MSJERROR_DAN    DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 3$' ; Nombre único
+    MSJERROR_DAN    DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 3$' ; Nombre Ãºnico
     MSJ_INV_VACIO   DB  'NO HAY PRODUCTOS EN INVENTARIO$' 
      
-    ; VARIABLES SUBMENÚ
+    ; VARIABLES SUBMENÃš
     TIT_INV_SUB     DB  '--- INVENTARIO ---$'
     OP1_INV_SUB     DB  '1.- A',165,'ADIR RECURSO$'
     OP2_INV_SUB     DB  '2.- LECTURA DE DATOS$'
@@ -142,7 +142,7 @@ INCLUDE biblioteca.txt
     OP_MSG_SUB      DB  'OP: $'
     OPDB_SUB        DB  2, 0, 2 DUP ('$')
     RUTA_INV        DB  'C:\SYSTGARD\DANIEL\stock.txt',0
-    ID_DAN          DW  0 ; Nombre único para Daniel
+    ID_DAN          DW  0 ; Nombre Ãºnico para Daniel
     MSJERRORINV     DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 4$'
     MSJERRORARC     DB  'OCURRIO UN ERROR CON EL ARCHIVO        $'
     ADD_INV         DB  101,0,102
@@ -200,6 +200,51 @@ INCLUDE biblioteca.txt
     MSJ_BITACORA_VACIA DB 'NO HAY CONTENIDO EN LA BITACORA$'
     TIT_EDICION_BITACORA DB '=== MODO EDICION BITACORA ===$'
     TIT_MOSTRAR_BITACORA DB '=== CONTENIDO DE BITACORA ===$'
+
+    ; ====================================================
+    ; --- VARIABLES DEL MODULO 2: CLIMA (ENCISO) ---
+    ; ==================================================== 
+    
+    val_temp_raw     db 0  
+    ; --- CÃ³digos para Traffic Lights ---
+    ; Puerto 4 - Word de 16 bits
+    
+    SEM_ROJO        EQU 0249h   ; Todos los semÃ¡foros en rojo
+    SEM_AMARILLO    EQU 0492h   ; Todos los semÃ¡foros en amarillo
+    SEM_VERDE       EQU 0924h   ; Todos los semÃ¡foros en verde       
+    ID               dw 0            ; Manejador de archivos 
+    fila_aux         db 0            ; Auxiliar para dibujo de marco 
+    ruta_clima       DB 'C:\SYSTGARD\ENCISO\clima.txt', 0
+    ruta_alertas     db 'C:\SYSTGARD\ENCISO\alertas.txt', 0
+    
+    ; Formatos del Historial (Conteo de caracteres exacto para macros)
+    msj_log_estable  db 'SISTEMA ESTABLE HORA:      ' ; Rellenado a 28 letras
+    msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
+    hora_txt         db '00:00'                   ; 5 letras 
+    msj_log_fin      db ' FUE: '                  ; 6 letras 
+    salto_linea      DB 13, 10                  ; 2 letras 
+    
+    ; Datos y Buffers
+    temp_ascii       db '00', '$' 
+    buffer_clima     db 400 dup('$') ; Capacidad para ~10 registros largos 
+    
+    ; Interfaz de Pantalla
+    txt_clima_tit      db ' < // CLIM/\TE MONITORING SYSTEM // > ' 
+    lbl_temp_act       db ' TEMPERATURE RE/\DING: [    ] C '          
+    msj_estado_ok      db ' SYSTEM ST/\TUS: [ OPTIMAL ] '            
+    msj_alerta_crt     db ' SYSTEM ST/\TUS: [ CRITICAL ] '           
+    msj_clima_menu     db ' [1] LOG [2] CLIMA [3] ALERTAS [4] EXIT'  
+    msj_hist_alertas   db ' --- CRITICAL ALERTS HISTORY --- ' ;
+    msj_lect_hist      db ' --- SYSTEM RE/\DINGS HISTORY --- '  
+    msj_lcd_alerta     DB 'ALERTA    '
+    msj_estado_alerta  DB ' SYSTEM ST/\TUS: [   ALERT ] '    
+    msj_lcd_ok         db 'SYSTEM: OK$'      
+    msj_lcd_warn       db '!! ALERT !!$'
+    msj_error_arc      db 'OCURRIO UN ERROR CON EL ARCHIVO  $' ; Error tÃ©cnico 
+    msj_vacio_e        db ' [INFO] Sin registros guardados aun.  $' ; Sin datos  
+    
+    ; ====================================================    
+    ; ====================================================
         
 .CODE
 INICIO:
@@ -215,7 +260,7 @@ INICIO:
     LIMPIAR_PANTALLA
     CALL MODULO_LOGIN
     
-    ; --- MENÚ ---
+    ; --- MENÃš ---
     LIMPIAR_PANTALLA
     CALL MENU_PRINCIPAL
     JMP FIN
@@ -237,5 +282,6 @@ INCLUDE Fernando\logs.asm
 INCLUDE Fernando\robotica.asm
 INCLUDE Fernando\logs.asm
 INCLUDE Daniel\inventario.asm
+INCLUDE Enciso\clima.asm
 
 END INICIO
