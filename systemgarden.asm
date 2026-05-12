@@ -97,6 +97,7 @@ INCLUDE biblioteca.txt
     
     log_entry      db '                           ACCESO ADMIN REGISTRADO', 13, 10  ; Longitud exacta = 25
     
+
     ; ====================================================
     ; --- MODULO ROBOTICA (FERNANDO) ---
     ; ====================================================
@@ -118,9 +119,88 @@ INCLUDE biblioteca.txt
     msg_temp       db 'TEMP: 25C ', 13, 10 ; 12 bytes
     msg_hum        db 'HUM:  60% ', 13, 10 ; 12 bytes
     msg_imp       db ' [!] Enviando reporte a impresora...', '$'
-    
     ; Buffer para leer el estado
-    buffer_sens    db 24 dup('$')    
+    buffer_sens    db 24 dup('$')
+     
+    ; VARIABLES DE DANIEL
+    TIT_INV         DB  'SELECCIONA EL PROCEDIMIENTO'
+    OP_INV          DB  'OP:'
+    OP1_INV         DB  'INVENTARIO (1)'
+    OP2_INV         DB  'FLUJO DE RIEGO (2)'
+    OP3_INV         DB  'SALIR (3)'
+    OPDB_INV        DB  2,1,3 DUP('$')
+    MSJPRUEBA       DB  'ESTO ES UNA PRUEBA                     $'
+    MSJERROR_DAN    DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 3$' ; Nombre único
+    MSJ_INV_VACIO   DB  'NO HAY PRODUCTOS EN INVENTARIO$' 
+     
+    ; VARIABLES SUBMENÚ
+    TIT_INV_SUB     DB  '--- INVENTARIO ---$'
+    OP1_INV_SUB     DB  '1.- A',165,'ADIR RECURSO$'
+    OP2_INV_SUB     DB  '2.- LECTURA DE DATOS$'
+    OP3_INV_SUB     DB  '3.- ELIMINAR INVENTARIO$'
+    OP4_INV_SUB     DB  '4.- REGRESAR$'
+    OP_MSG_SUB      DB  'OP: $'
+    OPDB_SUB        DB  2, 0, 2 DUP ('$')
+    RUTA_INV        DB  'C:\SYSTGARD\DANIEL\stock.txt',0
+    ID_DAN          DW  0 ; Nombre único para Daniel
+    MSJERRORINV     DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 4$'
+    MSJERRORARC     DB  'OCURRIO UN ERROR CON EL ARCHIVO        $'
+    ADD_INV         DB  101,0,102
+    MSJ_ELIMINADO   DB  'INVENTARIO ELIMINADO CORRECTAMENTE$'
+    MSJ_ERROR_READ  DB  'INTRODUCE UN VALOR ENTRE 1 Y 2$' 
+     
+    ; FORMULARIO ADD
+    TIT_ADD         DB  '=== AGREGAR DATOS ==='
+    MSG_RECURSO     DB  'RECURSO: '
+    MSG_CANTIDAD    DB  'CANTIDAD: '
+    MSJ_LIMITE      DB  'YA HAS LLEGADO AL LIMITE DEL INVENTARIO$'
+    BUFFER_NOMBRE   DB  20,0,22 DUP(' ')
+    BUFFER_CANT     DB  5,0,7 DUP(' ')
+    ESPACIO         DB  ' - '
+    SALTO_LINEA     DB 13,10
+    CONTADOR_INV    DB  0 
+    
+    ; FORMULARIO LECTURA
+    BUFFER_LECTURA  DB  300 DUP('$')
+    BYTES_LEIDOS    DW  0
+    TIT_READ        DB  '=== LECTURA DE INVENTARIO ==='
+    OP1_READ        DB  '1.- DESPLEGAR EN LCD'
+    OP2_READ        DB  '2.- REGRESAR'
+    OP_READ         DB  'OP: '
+    OPDB_READ       DB  2,0,3 DUP('$')
+    MSJ_LCD         DB  'DATOS ENVIADOS AL LCD$'
+    FILA_READ       DB  5
+    INDICE_DAN      DW  0 
+    TOTAL_PRODUCTOS DB  0 
+    
+    ; FORMULARIO RIEGO
+    TIT_RIEGO       DB  '=== CONTROL DE RIEGO ==='
+    OP1_RIEGO       DB  '1.- INICIAR RIEGO'
+    OP2_RIEGO       DB  '2.- DETENER RIEGO'
+    OP3_RIEGO       DB  '3.- VER BITACORA'
+    OP4_RIEGO       DB  '4.- REGRESAR'
+    MSG_RIEGO_OP    DB  'OP: '
+    OPDB_RIEGO      DB  2,0,3 DUP('$')
+    MSJ_RIEGO_ON    DB  'RIEGO ACTIVADO$'
+    MSJ_RIEGO_OFF   DB  'RIEGO DETENIDO$'
+    MSJ_ERROR_RIEGO DB  'INTRODUCE UN VALOR NUMERICO ENTRE 1 - 4$'
+    
+    ; FORMULARIO BITACORA
+    TIT_BITACORA      DB '=== BITACORA ==='
+    OP1_BITACORA      DB '1.- EDITAR BITACORA'
+    OP2_BITACORA      DB '2.- VER BITACORA'
+    OP3_BITACORA      DB '3.- REGRESAR'
+    MSG_BITACORA_OP   DB 'OP: '
+    OPDB_BITACORA     DB 2,0,3 DUP('$')
+    RUTA_BITACORA     DB 'C:\SYSTGARD\DANIEL\bitacora.txt',0
+    BUFFER_BITACORA   DB 100,0,102 DUP(' ')
+    LECTURA_BITACORA  DB 500 DUP('$')
+    MSJ_CREAR_BIT     DB 'PRIMERO CREA UNA BITACORA$'
+    MSJ_GUARDADO      DB 'BITACORA GUARDADA$'
+    MSJ_BITACORA_VACIA DB 'NO HAY CONTENIDO EN LA BITACORA$'
+    TIT_EDICION_BITACORA DB '=== MODO EDICION BITACORA ===$'
+    TIT_MOSTRAR_BITACORA DB '=== CONTENIDO DE BITACORA ===$'
+        
 .CODE
 INICIO:
     MOV AX,@DATA
@@ -128,8 +208,8 @@ INICIO:
     MOV ES,AX
 
     ; --- FASE 1: INICIALIZACION DE DIRECTORIOS ---
-;    LIMPIAR_PANTALLA
-;    CALL MODULO_BOOT
+     ;LIMPIAR_PANTALLA
+     ;CALL MODULO_BOOT
 
     ; --- FASE 2: INTERFAZ DE ACCESO ---
     LIMPIAR_PANTALLA
@@ -155,5 +235,7 @@ INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
 INCLUDE Fernando\robotica.asm
+INCLUDE Fernando\logs.asm
+INCLUDE Daniel\inventario.asm
 
 END INICIO
