@@ -77,7 +77,7 @@ INCLUDE biblioteca.txt
     txt_menu_tit   db ' < // G/\RDEN CONTROL PANEL // > '    
     opt_1          db ' [1] Gestion de Inventario ' 
     opt_2          db ' [2] Monitoreo Climatico '   
-    opt_3          db ' [3] Automatizacion Robotica ' ; 40 letras
+    opt_3          db ' [3] Control de termometro ' ; 40 letras
     opt_4          db ' [4] Ver Historial de Accesos (Logs) '
     opt_5          db ' [5] Utilidades del Sistema '         
     opt_6          db ' [6] Salir de SystemGarden '          
