@@ -128,5 +128,7 @@ INCLUDE Fernando\login.asm
 INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm
+INCLUDE Victor\print.asm
+INCLUDE Victor\robotica.asm
 
 END INICIO
