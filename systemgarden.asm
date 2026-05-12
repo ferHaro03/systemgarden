@@ -7,6 +7,7 @@
 #start=stepper_motor.exe#
 #start=robot.exe#
 #start=printer.exe#
+#start=Thermometer.exe#  
 
 INCLUDE biblioteca.txt
  
@@ -157,7 +158,6 @@ INCLUDE biblioteca.txt
     BUFFER_NOMBRE   DB  20,0,22 DUP(' ')
     BUFFER_CANT     DB  5,0,7 DUP(' ')
     ESPACIO         DB  ' - '
-    SALTO_LINEA     DB 13,10
     CONTADOR_INV    DB  0 
     
     ; FORMULARIO LECTURA
@@ -222,7 +222,7 @@ INCLUDE biblioteca.txt
     msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
     hora_txt         db '00:00'                   ; 5 letras 
     msj_log_fin      db ' FUE: '                  ; 6 letras 
-    salto_linea      DB 13, 10                  ; 2 letras 
+    salto_linea      db 13, 10                  ; 2 letras 
     
     ; Datos y Buffers
     temp_ascii       db '00', '$' 
@@ -243,8 +243,20 @@ INCLUDE biblioteca.txt
     msj_error_arc      db 'OCURRIO UN ERROR CON EL ARCHIVO  $' ; Error técnico 
     msj_vacio_e        db ' [INFO] Sin registros guardados aun.  $' ; Sin datos  
     
-    ; ====================================================    
-    ; ====================================================
+    ; ==================================================== 
+    ; TERMOMETRO MODULO    
+    ; ====================================================  
+    interfazTemperatura1    db 'Seleccione una opcion:  '
+    interfazTemperatura2    db '[1] Encender            '
+    interfazTemperatura3    db '[2] Apagar              '
+    interfazTemperatura4    db '[3] Leer                '
+    interfazTemperatura5    db '[4] Salir               '
+    interfazTemperatura6    db 'Opcion [ ]              '
+    
+    temp        db 0
+    digitos     db 0, 0
+    puerto      dw 0
+    opcion_temperatura db 0 
         
 .CODE
 INICIO:
@@ -263,7 +275,9 @@ INICIO:
     ; --- MENÚ ---
     LIMPIAR_PANTALLA
     CALL MENU_PRINCIPAL
-    JMP FIN
+    JMP FIN 
+    
+    
 
 ERROR:
     CURSOR 22,20,0
@@ -279,7 +293,8 @@ INCLUDE Fernando\login.asm
 INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
-INCLUDE Fernando\robotica.asm
+INCLUDE Fernando\robotica.asm 
+INCLUDE Victor\termometro.asm
 INCLUDE Fernando\logs.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm

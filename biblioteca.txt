@@ -53,6 +53,12 @@ LECTURA_CADENA MACRO CADENA
 	INT 21H
 LECTURA_CADENA ENDM
 
+leerCaracter macro caracter
+        mov ah, 1
+        int 21h
+        mov caracter, al
+leerCaracter endm
+
 IMP_COLOR MACRO CADENA,LONGITUD,PAGINA,MODO,REN,COL,COLOR
 	MOV AH,19
 	LEA BP,CADENA
@@ -144,6 +150,113 @@ FONDO_COLOR MACRO COLOR,FILL
     MOV CX,2100
     INT 10H
 ENDM
+
+;=====================================MACROS VICTOR
+;Temperatura
+encTer macro
+        mov al, 1
+        out 127, al    
+    encTer endm
+    
+    apaTer macro
+        mov al, 0
+        out 127, al    
+    apaTer endm    
+    
+    leerTer macro temperatura
+        in al, 125
+        mov temperatura, al
+    leerTer endm
+    
+    sevSeg0 macro puer
+        mov al, 00111111b
+        mov dx, puer 
+        out dx, al    
+    sevSeg0 endm
+    
+    sevSeg1 macro puer
+        mov al, 00000110b
+        mov dx, puer 
+        out dx, al    
+    sevSeg1 endm
+    
+    sevSeg2 macro puer
+        mov al, 01011011b
+        mov dx, puer 
+        out dx, al    
+    sevSeg2 endm
+    
+    sevSeg3 macro puer
+        mov al, 01001111b
+        mov dx, puer 
+        out dx, al    
+    sevSeg3 endm  
+    
+    sevSeg4 macro puer
+        mov al, 01100110b
+        mov dx, puer 
+        out dx, al    
+    sevSeg4 endm
+    
+    sevSeg5 macro puer
+        mov al, 01101101b
+        mov dx, puer 
+        out dx, al    
+    sevSeg5 endm
+    
+    sevSeg6 macro puer
+        mov al, 01111101b
+        mov dx, puer 
+        out dx, al    
+    sevSeg6 endm
+    
+    sevSeg7 macro puer
+        mov al, 00000111b
+        mov dx, puer 
+        out dx, al    
+    sevSeg7 endm
+    
+    sevSeg8 macro puer
+        mov al, 01111111b
+        mov dx, puer 
+        out dx, al    
+    sevSeg8 endm
+    
+    sevSeg9 macro puer
+        mov al, 01101111b
+        mov dx, puer 
+        out dx, al    
+    sevSeg9 endm
+    
+    sevSeg10 macro puer
+        mov al, 00000110b
+        mov dx, puer 
+        out dx, al
+        
+        inc dx
+        mov al, 00111111b
+        out dx, al     
+    sevSeg10 endm
+    
+    sevSeg11 macro puer
+        mov al, 00000110b
+        mov dx, puer 
+        out dx, al
+        
+        inc dx
+        mov al, 00000110b
+        out dx, al     
+    sevSeg11 endm
+    
+    sevSeg12 macro puer
+        mov al, 00000110b
+        mov dx, puer 
+        out dx, al
+        
+        inc dx
+        mov al, 01011011b
+        out dx, al     
+    sevSeg12 endm	
 
 ;======================================FIN MACROS=== 
 

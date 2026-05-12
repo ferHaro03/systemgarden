@@ -64,7 +64,7 @@ modulo_enciso:
     JMP menu_inicio
 
 modulo_victor:
-    CALL MODULO_ROBOTICA
+    CALL MODULO_TERMOMETRO
     JMP menu_inicio
 
 ver_logs:
