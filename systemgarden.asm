@@ -4,6 +4,10 @@
 ; EQUIPO: Fernando, Daniel, Enciso, Victor
 ;***************************************
 
+#start=stepper_motor.exe#
+#start=robot.exe#
+#start=printer.exe#
+
 INCLUDE biblioteca.txt
  
 .MODEL SMALL
@@ -70,9 +74,9 @@ INCLUDE biblioteca.txt
     ; --- 5. MODULO: MENU PRINCIPAL ---
     ; ====================================================
     txt_menu_tit   db ' < // G/\RDEN CONTROL PANEL // > '    
-    opt_1          db ' [1] Gestion de Inventario (Daniel) ' 
-    opt_2          db ' [2] Monitoreo Climatico (Enciso) '   
-    opt_3          db ' [3] Automatizacion Robotica (Victor) '
+    opt_1          db ' [1] Gestion de Inventario ' 
+    opt_2          db ' [2] Monitoreo Climatico '   
+    opt_3          db ' [3] Automatizacion Robotica ' ; 40 letras
     opt_4          db ' [4] Ver Historial de Accesos (Logs) '
     opt_5          db ' [5] Utilidades del Sistema '         
     opt_6          db ' [6] Salir de SystemGarden '          
@@ -91,10 +95,32 @@ INCLUDE biblioteca.txt
     msg_log_vacio  db ' [!] El historial esta vacio. '   ; 30 letras
     msg_log_err    db ' [X] Error al leer el historial. ' ; 33 letras 
     
-    log_entry      db 'ACCESO ADMIN REGISTRADO', 13, 10  ; Longitud exacta = 25
+    log_entry      db '                           ACCESO ADMIN REGISTRADO', 13, 10  ; Longitud exacta = 25
     
+    ; ====================================================
+    ; --- MODULO ROBOTICA (FERNANDO) ---
+    ; ====================================================
+    txt_rob_tit db ' < // M0DULO DE AUTOMATIZACION // > ' ; 36 letras
+    rob_opt1    db ' [1] Abrir Valvula Riego (Stepper)  ' ; 36 letras
+    rob_opt2    db ' [2] Desplegar Robot Recolector     ' ; 36 letras
+    rob_opt3    db ' [3] Volver al Panel Principal      ' ; 36 letras
+    rob_opt4    db ' [4] Generar Reporte Impreso (TXT)  ' ; 36 letras
+    
+    rob_msg1    db ' [!] Motor Stepper activado...      ' ; 36 letras
+    rob_msg2    db ' [!] Robot en movimiento...         ' ; 36 letras
 
+    ; --- CONFIGURACIÓN DE SEGUNDO ARCHIVO ---
+    file_sensores  db 'C:\SYSTGARD\FERNANDO\sensores.txt', 0
+    handle_sens    dw ?
+
+    ; Datos a manipular (ejemplo: Temperatura y Humedad)
+    ; Usamos 10 bytes para que sea fácil de leer/escribir
+    msg_temp       db 'TEMP: 25C ', 13, 10 ; 12 bytes
+    msg_hum        db 'HUM:  60% ', 13, 10 ; 12 bytes
+    msg_imp       db ' [!] Enviando reporte a impresora...', '$'
     
+    ; Buffer para leer el estado
+    buffer_sens    db 24 dup('$')    
 .CODE
 INICIO:
     MOV AX,@DATA
@@ -127,6 +153,7 @@ FIN:
 INCLUDE Fernando\login.asm
 INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
-INCLUDE Fernando\logs.asm
+INCLUDE Fernando\logs.asm  
+INCLUDE Fernando\robotica.asm
 
 END INICIO

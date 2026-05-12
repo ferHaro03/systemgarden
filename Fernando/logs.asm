@@ -46,7 +46,7 @@ dibujar_lados_logs:
     CMP AX, 0
     JE log_vacio
     
-    CURSOR 6, 5, 0
+    CURSOR 6, 0, 0
     IMP_SINCOLOR buffer_log
     
     JMP fin_logs

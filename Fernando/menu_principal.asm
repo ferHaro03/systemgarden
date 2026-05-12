@@ -26,9 +26,9 @@ dibujar_lados_menu:
     IMP_COLOR txt_menu_tit, 33, 0, 0, 3, 24, 0AH
     
     ; 3. Listado de Opciones (Blanco Brillante = 0FH)
-    IMP_COLOR opt_1, 36, 0, 0, 7,  20, 0FH
-    IMP_COLOR opt_2, 34, 0, 0, 9,  20, 0FH
-    IMP_COLOR opt_3, 38, 0, 0, 11, 20, 0FH
+    IMP_COLOR opt_1, 27, 0, 0, 7,  20, 0FH
+    IMP_COLOR opt_2, 25, 0, 0, 9,  20, 0FH
+    IMP_COLOR opt_3, 29, 0, 0, 11, 20, 0FH
     IMP_COLOR opt_4, 37, 0, 0, 13, 20, 0FH
     IMP_COLOR opt_5, 28, 0, 0, 15, 20, 0FH
     IMP_COLOR opt_6, 27, 0, 0, 17, 20, 0FH
@@ -64,7 +64,7 @@ modulo_enciso:
     JMP menu_inicio
 
 modulo_victor:
-    ; CALL MODULO_ROBOTICA
+    CALL MODULO_ROBOTICA
     JMP menu_inicio
 
 ver_logs:
@@ -77,5 +77,5 @@ utilidades:
 salir_sistema:
     LIMPIAR_PANTALLA 07H    
     IMP_COLOR msg_salida, 20, 0, 0, 12, 30, 0CH  ; Rojo Claro
-    RET                     
+    JMP FIN                     
 MENU_PRINCIPAL ENDP

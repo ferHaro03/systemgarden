@@ -89,6 +89,16 @@ ok_v:
     MOV handle_log, AX
     CERRAR_ARCHIVO handle_log
     
+    ; Crear archivo de sensores/estado
+    CREAR_ARCHIVO file_sensores, 0
+    MOV handle_sens, AX
+    
+    ; Escribir valores iniciales por defecto
+    ESCRIBIR_ARCHIVO handle_sens, 12, msg_temp
+    ESCRIBIR_ARCHIVO handle_sens, 12, msg_hum
+    
+    CERRAR_ARCHIVO handle_sens
+    
     ; --- PAUSA FINAL (Amarillo 0EH) ---
     IMP_COLOR msg_paus, 27, 0, 0, 23, 27, 0EH
     RASTREO
