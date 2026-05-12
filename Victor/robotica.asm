@@ -1,9 +1,6 @@
    
 robot proc
-    #start=Robot.exe#    
-    mov ax, @data
-    mov ds, ax
-    mov es, ax     
+    #start=Robot.exe#     
     
     irinterfaz:
         cursor 0,0,0
@@ -31,10 +28,4 @@ robot proc
     funGirIzq:
         girarIzquierda
         jmp irinterfaz
-    
-    fin:
-        mov ax, 4c00h
-        int 21h
-        
-    include robotica_print.lib 
 endp 
