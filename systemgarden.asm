@@ -7,6 +7,8 @@
 #start=robot.exe#
 #start=printer.exe#
 #start=emulation kit.exe#
+#start=Thermometer.exe#  
+
 
 INCLUDE biblioteca.txt
  
@@ -76,9 +78,9 @@ INCLUDE biblioteca.txt
     txt_menu_tit   db ' < // G/\RDEN CONTROL PANEL // > '    
     opt_1          db ' [1] Gestion de Inventario ' 
     opt_2          db ' [2] Monitoreo Climatico '   
-    opt_3          db ' [3] Automatizacion Robotica ' ; 40 letras
-    opt_4          db ' [4] Ver Historial de Accesos (Logs) '
-    opt_5          db ' [5] Utilidades del Sistema '         
+    opt_3          db ' [3] Control de termometro ' ; 40 letras
+    opt_4          db ' [4] Automatizaci�nes      '
+    opt_5          db ' [5] Ver Historial de Accesos '         
     opt_6          db ' [6] Salir de SystemGarden '          
     
     prompt_sel     db ' > Seleccione una opcion: [ ]'        
@@ -163,7 +165,6 @@ INCLUDE biblioteca.txt
     BUFFER_NOMBRE   DB  20,0,22 DUP(' ')
     BUFFER_CANT     DB  5,0,7 DUP(' ')
     ESPACIO         DB  ' - '
-    SALTO_LINEA     DB 13,10
     CONTADOR_INV    DB  0 
     
     ; FORMULARIO LECTURA
@@ -228,6 +229,8 @@ INCLUDE biblioteca.txt
     msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
     hora_txt         db '00:00'                   ; 5 letras 
     msj_log_fin      db ' FUE: '                  ; 6 letras 
+
+    salto_linea      db 13, 10                  ; 2 letras 
     
     ; Datos y Buffers
     temp_ascii       db '00', '$' 
@@ -248,8 +251,20 @@ INCLUDE biblioteca.txt
     msj_error_arc      db 'OCURRIO UN ERROR CON EL ARCHIVO  $' ; Error técnico 
     msj_vacio_e        db ' [INFO] Sin registros guardados aun.  $' ; Sin datos  
     
-    ; ====================================================    
-    ; ====================================================
+    ; ==================================================== 
+    ; TERMOMETRO MODULO    
+    ; ====================================================  
+    interfazTemperatura1    db 'Seleccione una opcion:  '
+    interfazTemperatura2    db '[1] Encender            '
+    interfazTemperatura3    db '[2] Apagar              '
+    interfazTemperatura4    db '[3] Leer                '
+    interfazTemperatura5    db '[4] Salir               '
+    interfazTemperatura6    db 'Opcion [ ]              '
+    
+    temp        db 0
+    digitos     db 0, 0
+    puerto      dw 0
+    opcion_temperatura db 0 
         
 .CODE
 INICIO:
@@ -268,7 +283,9 @@ INICIO:
     ; --- MENÚ ---
     LIMPIAR_PANTALLA
     CALL MENU_PRINCIPAL
-    JMP FIN
+    JMP FIN 
+    
+    
 
 ERROR:
     CURSOR 22,20,0
@@ -285,6 +302,7 @@ INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
 INCLUDE Fernando\robotica.asm
+INCLUDE Victor\termometro.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm
 
