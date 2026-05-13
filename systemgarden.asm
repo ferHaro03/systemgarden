@@ -4,10 +4,11 @@
 ; EQUIPO: Fernando, Daniel, Enciso, Victor
 ;***************************************
 
-#start=stepper_motor.exe#
 #start=robot.exe#
 #start=printer.exe#
-#start=Thermometer.exe#  
+#start=emulation kit.exe#
+#start=Thermometer.exe#
+#start=stepper_motor.exe#  
 
 INCLUDE biblioteca.txt
  
@@ -77,9 +78,9 @@ INCLUDE biblioteca.txt
     txt_menu_tit   db ' < // G/\RDEN CONTROL PANEL // > '    
     opt_1          db ' [1] Gestion de Inventario ' 
     opt_2          db ' [2] Monitoreo Climatico '   
-    opt_3          db ' [3] Control de termometro ' ; 40 letras
-    opt_4          db ' [4] Ver Historial de Accesos (Logs) '
-    opt_5          db ' [5] Utilidades del Sistema '         
+    opt_3          db ' [3] Control de termometro   ' ; 40 letras
+    opt_4          db ' [4] Automatizaciónes      '
+    opt_5          db ' [5] Ver Historial de Accesos '         
     opt_6          db ' [6] Salir de SystemGarden '          
     
     prompt_sel     db ' > Seleccione una opcion: [ ]'        
@@ -103,14 +104,19 @@ INCLUDE biblioteca.txt
     ; --- MODULO ROBOTICA (FERNANDO) ---
     ; ====================================================
     txt_rob_tit db ' < // M0DULO DE AUTOMATIZACION // > ' ; 36 letras
-    rob_opt1    db ' [1] Abrir Valvula Riego (Stepper)  ' ; 36 letras
-    rob_opt2    db ' [2] Desplegar Robot Recolector     ' ; 36 letras
+    rob_opt1    db ' [1] Desplegar Robot Recolector     ' ; 36 letras
+    rob_opt2    db ' [2] Generar Reporte Impreso (TXT)  ' ; 36 letras
     rob_opt3    db ' [3] Volver al Panel Principal      ' ; 36 letras
-    rob_opt4    db ' [4] Generar Reporte Impreso (TXT)  ' ; 36 letras
     
-    rob_msg1    db ' [!] Motor Stepper activado...      ' ; 36 letras
+    rob_msg1    db ' [!] Pressure Gauge activado...     ' ; 36 letras
     rob_msg2    db ' [!] Robot en movimiento...         ' ; 36 letras
-
+    rob_msg3    db ' [!] Robot Rumba activado...        ' ; 36 letras
+    
+    pasos_rumba  db 1   ; longitud del tramo actual
+    giros_rumba  db 0   ; contador de giros realizados
+    limite_rumba db 6   ; tamaño máximo de espiral (6 = cubre buen área)
+    cont_pasos   db 0 
+    
     ; --- CONFIGURACIÃ“N DE SEGUNDO ARCHIVO ---
     file_sensores  db 'C:\SYSTGARD\FERNANDO\sensores.txt', 0
     handle_sens    dw ?
@@ -200,13 +206,26 @@ INCLUDE biblioteca.txt
     MSJ_BITACORA_VACIA DB 'NO HAY CONTENIDO EN LA BITACORA$'
     TIT_EDICION_BITACORA DB '=== MODO EDICION BITACORA ===$'
     TIT_MOSTRAR_BITACORA DB '=== CONTENIDO DE BITACORA ===$'
+     
+    MSJ_DIA_REG        DB 'DIA DE REGISTRO: $'
+    MSJ_TITULO_BIT     DB 'TITULO DE BITACORA: $'
+    MSJ_CONTENIDO_BIT  DB 'CONTENIDO: $'
+    MSJ_FIRMA_BIT      DB 'FIRMA: $'
+    MSJ_BIT_GENERADA   DB 'BITACORA GENERADA CORRECTAMENTE.$'
+    MSJ_SIN_BITACORA   DB 'TODAVIA NO HAS CREADO NINGUNA BITACORA.$'
 
+    TXT_DIA_REG        DB 'DIA DE REGISTRO: '
+    TXT_TITULO_BIT     DB 'TITULO DE BITACORA: '
+    TXT_CONTENIDO_BIT  DB 'CONTENIDO: '
+    TXT_FIRMA_BIT      DB 'FIRMA: '         
+       
+    BITACORA_CREADA DB 0           
     ; ====================================================
     ; --- VARIABLES DEL MODULO 2: CLIMA (ENCISO) ---
     ; ==================================================== 
     
     val_temp_raw     db 0  
-    ; --- CÃ³digos para Traffic Lights ---
+    ; --- Codigos para Traffic Lights ---
     ; Puerto 4 - Word de 16 bits
     
     SEM_ROJO        EQU 0249h   ; Todos los semÃ¡foros en rojo
@@ -222,6 +241,7 @@ INCLUDE biblioteca.txt
     msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
     hora_txt         db '00:00'                   ; 5 letras 
     msj_log_fin      db ' FUE: '                  ; 6 letras 
+
     salto_linea      db 13, 10                  ; 2 letras 
     
     ; Datos y Buffers
@@ -266,8 +286,8 @@ INICIO:
     MOV ES,AX
 
     ; --- FASE 1: INICIALIZACION DE DIRECTORIOS ---
-     LIMPIAR_PANTALLA
-     CALL MODULO_BOOT
+     ;LIMPIAR_PANTALLA
+     ;CALL MODULO_BOOT
 
     ; --- FASE 2: INTERFAZ DE ACCESO ---
     LIMPIAR_PANTALLA
@@ -294,7 +314,7 @@ INCLUDE Fernando\login.asm
 INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
-INCLUDE Fernando\robotica.asm 
+INCLUDE Fernando\robotica.asm
 INCLUDE Victor\termometro.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm

@@ -28,9 +28,9 @@ dibujar_lados_menu:
     ; 3. Listado de Opciones (Blanco Brillante = 0FH)
     IMP_COLOR opt_1, 27, 0, 0, 7,  20, 0FH
     IMP_COLOR opt_2, 25, 0, 0, 9,  20, 0FH
-    IMP_COLOR opt_3, 29, 0, 0, 11, 20, 0FH
-    IMP_COLOR opt_4, 37, 0, 0, 13, 20, 0FH
-    IMP_COLOR opt_5, 28, 0, 0, 15, 20, 0FH
+    IMP_COLOR opt_3, 27, 0, 0, 11, 20, 0FH
+    IMP_COLOR opt_4, 27, 0, 0, 13, 20, 0FH
+    IMP_COLOR opt_5, 30, 0, 0, 15, 20, 0FH
     IMP_COLOR opt_6, 27, 0, 0, 17, 20, 0FH
     
     ; 4. Prompt de Seleccion (Amarillo = 0EH)
@@ -47,9 +47,9 @@ seleccionar:
     CMP AL, '3'
     JE modulo_victor
     CMP AL, '4'
-    JE ver_logs
+    JE modulo_robotica
     CMP AL, '5'
-    JE utilidades
+    JE ver_logs
     CMP AL, '6'
     JE salir_sistema
     
@@ -72,6 +72,7 @@ ver_logs:
     JMP menu_inicio
 
 utilidades:
+    CALL MODULO_ROBOTICA
     JMP menu_inicio
 
 salir_sistema:

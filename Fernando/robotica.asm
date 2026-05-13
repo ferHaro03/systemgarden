@@ -24,7 +24,6 @@ dib_lados_rob:
     IMP_COLOR rob_opt1, 36, 0, 0, 8, 22, 0FH     
     IMP_COLOR rob_opt2, 36, 0, 0, 10, 22, 0FH
     IMP_COLOR rob_opt3, 36, 0, 0, 12, 22, 0FH
-    IMP_COLOR rob_opt4, 36, 0, 0, 14, 22, 0FH
     IMP_COLOR prompt_sel, 29, 0, 0, 18, 25, 0EH  
 
 seleccionar_rob:
@@ -32,13 +31,11 @@ seleccionar_rob:
     RASTREO                 
     
     CMP AL, '1'
-    JE activar_riego
-    CMP AL, '2'
     JE activar_robot
+    CMP AL, '2'
+    JE llamar_impresora
     CMP AL, '3'
     JE salir_robotica
-    CMP AL, '4'
-    JE llamar_impresora
     JMP seleccionar_rob    
 
 llamar_impresora:
@@ -46,86 +43,83 @@ llamar_impresora:
     JMP menu_robotica
 
 ; -------------------------------------------
-; RUTINA: MOTOR STEPPER (PUERTO 7)
+; RUTINA: MEDIDOR DE PRESIÓN (PUERTO 2088h)
 ; -------------------------------------------
-activar_riego:
-    IMP_COLOR rob_msg1, 36, 0, 0, 20, 22, 0BH 
-    
-    MOV CX, 15      ; Dará 50 pasos fluidos
-ciclo_stepper:
-    MOV AL, 3       
-    OUT 7, AL       
-    CALL RETARDO_STEPPER
-    
-    MOV AL, 6       
-    OUT 7, AL
-    CALL RETARDO_STEPPER
-    
-    MOV AL, 12      
-    OUT 7, AL
-    CALL RETARDO_STEPPER
-    
-    MOV AL, 9       
-    OUT 7, AL
-    CALL RETARDO_STEPPER
-    
-    LOOP ciclo_stepper
+activar_presion:
+    IMP_COLOR rob_msg1, 36, 0, 0, 20, 22, 0BH
+
+    MOV DX, 2088h
+    MOV AL, 0
+
+subir_presion:
+    OUT DX, AL
+    CALL RETARDO_PRESION
+    INC AL
+    CMP AL, 101          ; 101 porque INC va ANTES del CMP
+    JNE subir_presion
+
+    MOV CX, 15           ; pausa visible en el tope
+pausa_cima:
+    CALL RETARDO_PRESION
+    LOOP pausa_cima      ; CX aquí es seguro, no hay CALL anidado
+
+bajar_presion:
+    DEC AL
+    OUT DX, AL
+    CALL RETARDO_PRESION
+    CMP AL, 0
+    JNE bajar_presion
+
     JMP menu_robotica
 
 ; -------------------------------------------
 ; RUTINA INTELIGENTE: ROBOT RECOLECTOR 
 ; -------------------------------------------
 activar_robot:
-    IMP_COLOR rob_msg2, 36, 0, 0, 20, 22, 0BH 
-    
-    ; --- FASE 1: AVANZAR 3 CASILLAS ---
-    MOV CX, 3       
-avanza_bruto:
-    MOV AL, 3       ; COMANDO 3 = AVANZAR
-    OUT 9, AL       
-    CALL RETARDO_ROBOT 
-    LOOP avanza_bruto
-    
-    ; --- FASE 2: GIRAR A LA DERECHA ---
-    MOV AL, 1       ; COMANDO 1 = GIRAR DERECHA
-    OUT 9, AL
-    CALL RETARDO_ROBOT
+    IMP_COLOR rob_msg2, 36, 0, 0, 20, 22, 0BH
 
-    ; --- FASE 3: AVANZAR 2 CASILLAS MAS ---
-    MOV CX, 2
-avanza_mas:
-    MOV AL, 3       ; COMANDO 3 = AVANZAR
-    OUT 9, AL
-    CALL RETARDO_ROBOT
-    LOOP avanza_mas
+    MOV BYTE PTR [pasos_rumba], 1
+    MOV BYTE PTR [giros_rumba], 0
 
+rumba_loop:
+    MOV AL, [pasos_rumba]
+    CMP AL, [limite_rumba]
+    JG  rumba_fin
+
+    ; --- AVANZAR N pasos (usando variable, NO CX) ---
+    MOV AL, [pasos_rumba]
+    MOV [cont_pasos], AL    ; copiar a variable auxiliar
+
+avanza_tramo:
+    CALL WAIT_ROBOT
+    MOV AL, 1
+    OUT 9, AL              ; avanzar
+
+    DEC BYTE PTR [cont_pasos]
+    JNZ avanza_tramo        ; sin LOOP, sin tocar CX
+
+    ; --- GIRAR A LA DERECHA ---
+    CALL WAIT_ROBOT
+    MOV AL, 3
+    OUT 9, AL              ; girar derecha
+
+    ; --- Cada 2 giros ? pasos++ ---
+    INC BYTE PTR [giros_rumba]
+    MOV AL, [giros_rumba]
+    AND AL, 01H
+    JNZ rumba_loop
+    INC BYTE PTR [pasos_rumba]
+    JMP rumba_loop
+
+rumba_fin:
     JMP menu_robotica
 
 salir_robotica:
     RET
+    
 MODULO_ROBOTICA ENDP
 
 ; --- SUBRUTINAS DE HARDWARE ---
-
-RETARDO_STEPPER PROC
-    PUSH CX
-    MOV CX, 000FH   ; Velocidad ideal para que el Stepper se vea fluido
-pausa_step: LOOP pausa_step
-    POP CX
-    RET
-RETARDO_STEPPER ENDP
-
-RETARDO_ROBOT PROC
-    PUSH CX
-    ; El robot necesita mas tiempo grafico que la aguja del motor.
-    ; Empezamos con 00FFH. Si el robot no alcanza a dar el paso completo, 
-    ; subele un cero (ej. 0FFFH). Si va muy lento, bajale.
-    MOV CX, 000FH   
-pausa_rob: LOOP pausa_rob
-    POP CX
-    RET
-RETARDO_ROBOT ENDP   
-
 ; --- RUTINA PARA ACTUALIZAR SENSORES ---
 ACTUALIZAR_ESTADO PROC
     ; Abrir el archivo en modo lectura/escritura (2)
@@ -205,3 +199,25 @@ ciclo_impresora:
 fin_impresion:
     RET
 IMPRIMIR_REPORTE ENDP
+
+RETARDO_PRESION PROC
+    PUSH AX
+    PUSH CX
+    PUSH DX
+    MOV AH, 86H
+    MOV CX, 0000H
+    MOV DX, 0C350H      ; 50,000µs = aguja visible y fluida
+    INT 15H
+    POP DX
+    POP CX
+    POP AX
+    RET
+RETARDO_PRESION ENDP
+
+WAIT_ROBOT PROC
+esperar_robot:
+    IN  AL, 11              ; leer estado del robot
+    TEST AL, 00000010b      ; bit 1 = robot ocupado
+    JNZ esperar_robot       ; si está ocupado, seguir esperando
+    RET
+WAIT_ROBOT ENDP

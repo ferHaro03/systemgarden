@@ -1,516 +1,869 @@
-;MODULO DANIEL - ADAPTADO PARA SER LLAMADO DESDE MAIN
-; Se llama con: CALL PROCESO_DANIEL
-; Retorna con RET al menu principal
-;****************************************************************
- 
-; NOTA: Las variables ya están declaradas en el .DATA del MAIN (systemgarden.asm)
-; NO se repiten aquí. Este archivo solo contiene el bloque .CODE del módulo.
- 
 ; ================================================================
-; SALTO_LINEA_DAN: declarado aquí como dato local en segmento de código
+; MODULO DANIEL - v7 FINAL
+; Inventario funcional + Bitacora corregida
 ; ================================================================
-; ADVERTENCIA: SALTO_LINEA ya existe en el MAIN, renómbrala si hay conflicto
-; Verifica que en el .DATA del main tengas:
-;   SALTO_LINEA_DAN  DB 13,10
- 
+
 PROCESO_DANIEL PROC
- 
-;1.- GENERAR MENÚ DE INVENTARIO 
+
+; ================================================================
+; 1.- MENU PRINCIPAL DE DANIEL
+; ================================================================
 MENU_MAIN_INVENTARIO:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    CURSOR 0,0,0
-    FONDO_COLOR 1EH,32
-    IMP_COLOR TIT_INV,27,0,0,2,30,090
-    IMP_COLOR OP1_INV,14,0,0,6,30,100
-    IMP_COLOR OP2_INV,18,0,0,8,30,100
-    IMP_COLOR OP3_INV,9,0,0,10,30,100
-    IMP_COLOR OP_INV,3,0,0,12,30,100 
- 
-;1.1- SELECCIONAR OPCIONES EN MENÚ
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_MENU_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_MENU_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_INV, 27, 0, 0, 3, 26, 0AH
+    IMP_COLOR OP1_INV, 14, 0, 0, 7, 25, 0FH
+    IMP_COLOR OP2_INV, 18, 0, 0, 9, 25, 0FH
+    IMP_COLOR OP3_INV, 9, 0, 0, 11, 25, 0FH
+    IMP_COLOR OP_INV, 3, 0, 0, 14, 25, 0EH
+
 OP_MAIN_DAN:
-    CURSOR 12,35,0
-    LECTURA_CADENA OPDB_INV 
-    CMP OPDB_INV+2,'1'
+    CURSOR 14, 30, 0
+    LECTURA_CADENA OPDB_INV
+
+    CMP OPDB_INV+2, '1'
     JE INVENTARIO_DAN
-    CMP OPDB_INV+2,'2'
+    CMP OPDB_INV+2, '2'
     JE RIEGO_DAN
-    CMP OPDB_INV+2,'3'
-    JE FIN_DANIEL          ; <-- En lugar de JMP FIN del main, retornamos
+    CMP OPDB_INV+2, '3'
+    JE FIN_DANIEL
     JMP ERROR_DAN
-  
-;2.- SUBMENÚ INVENTARIO
+
+; ================================================================
+; 2.- SUBMENU INVENTARIO
+; ================================================================
 INVENTARIO_DAN:
-    NEWPAGE             
-    CURSOR 0,0,0        
-    FONDO_COLOR 1EH,32
-    IMP_COLOR TIT_INV_SUB, 18, 0, 0, 2, 30, 01EH
-    IMP_COLOR OP1_INV_SUB, 18, 0, 0, 6, 25, 01EH
-    IMP_COLOR OP2_INV_SUB, 20, 0, 0, 8, 25, 01EH
-    IMP_COLOR OP3_INV_SUB, 23, 0, 0, 10, 25, 01EH
-    IMP_COLOR OP4_INV_SUB, 12, 0, 0, 12, 25, 01EH
-    IMP_COLOR OP_MSG_SUB, 4, 0, 0, 15, 25, 01EH
-    
-INVENTARIO_OP_DAN:
-    CURSOR 15, 30, 0
-    LECTURA_CADENA OPDB_SUB
-    CMP OPDB_SUB+2, '1'
-    JE  ADD_RECURSO_DAN
-    CMP OPDB_SUB+2, '2'
-    JE  READ_DATA_DAN
-    CMP OPDB_SUB+2, '3'
-    JE  EDIT_DATA_DAN
-    CMP OPDB_SUB+2, '4'
-    JE  MENU_MAIN_INVENTARIO    ; Regresar al menú de Daniel
-    JMP ERROR_INV_DAN
-     
-;2.5. PANTALLA PARA AÑADIR RECURSOS AL INVENTARIO
-ADD_RECURSO_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    CURSOR 0,0,0
-    FONDO_COLOR 1EH,32
- 
-    CMP CONTADOR_INV,8
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_INV_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_INV_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_INV_SUB, 18, 0, 0, 3, 30, 0AH
+    IMP_COLOR OP1_INV_SUB, 18, 0, 0, 7, 25, 0FH
+    IMP_COLOR OP2_INV_SUB, 20, 0, 0, 9, 25, 0FH
+    IMP_COLOR OP3_INV_SUB, 23, 0, 0, 11, 25, 0FH
+    IMP_COLOR OP4_INV_SUB, 12, 0, 0, 13, 25, 0FH
+    IMP_COLOR OP_MSG_SUB, 4, 0, 0, 16, 25, 0EH
+
+INVENTARIO_OP_DAN:
+    CURSOR 16, 30, 0
+    LECTURA_CADENA OPDB_SUB
+
+    CMP OPDB_SUB+2, '1'
+    JE ADD_RECURSO_DAN
+    CMP OPDB_SUB+2, '2'
+    JE READ_DATA_DAN
+    CMP OPDB_SUB+2, '3'
+    JE EDIT_DATA_DAN
+    CMP OPDB_SUB+2, '4'
+    JE MENU_MAIN_INVENTARIO
+    JMP ERROR_INV_DAN
+
+; ================================================================
+; 2.5.- AGREGAR RECURSO
+; ================================================================
+ADD_RECURSO_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
+    NEWPAGE
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_ADD_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_ADD_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_ADD, 21, 0, 0, 3, 28, 0AH
+    IMP_COLOR MSG_RECURSO, 9, 0, 0, 8, 20, 0EH
+    IMP_COLOR MSG_CANTIDAD, 10, 0, 0, 10, 20, 0EH
+
+ADD_LOOP_DAN:
+    CMP CONTADOR_INV, 8
     JAE LIMITE_INV_DAN
- 
-    IMP_COLOR TIT_ADD,21,0,0,2,25,1EH
-    IMP_COLOR MSG_RECURSO,9,0,0,6,20,1EH
-    
-    CURSOR 6,32,0
+
+    BORRAR_SECCION 07H,8,32,8,70
+    BORRAR_SECCION 07H,10,32,10,70
+    BORRAR_SECCION 07H,20,10,20,70
+
+    CURSOR 8, 32, 0
     LECTURA_CADENA BUFFER_NOMBRE
-    
-    MOV CX,0
-    MOV CL,BUFFER_NOMBRE[1]
-    ADD CX,2
-    MOV SI,CX
-    MOV BUFFER_NOMBRE[SI],0
- 
-    ; SALIR CON "EXIT"
-    CMP BUFFER_NOMBRE+2,'E'
+
+    CMP BUFFER_NOMBRE+2, 'E'
     JNE CONTINUAR_ADD_DAN
-    CMP BUFFER_NOMBRE+3,'X'
+    CMP BUFFER_NOMBRE+3, 'X'
     JNE CONTINUAR_ADD_DAN
-    CMP BUFFER_NOMBRE+4,'I'
+    CMP BUFFER_NOMBRE+4, 'I'
     JNE CONTINUAR_ADD_DAN
-    CMP BUFFER_NOMBRE+5,'T'
+    CMP BUFFER_NOMBRE+5, 'T'
     JNE CONTINUAR_ADD_DAN
     JMP INVENTARIO_DAN
-  
-;2.6: LECTURA DE CONTENIDO PARA AGREGAR EN TXT
+
 CONTINUAR_ADD_DAN:
-    IMP_COLOR MSG_CANTIDAD,10,0,0,8,20,1EH
-    CURSOR 8,32,0
+    CURSOR 10, 32, 0
     LECTURA_CADENA BUFFER_CANT
-    
-    MOV CX,0
-    MOV CL,BUFFER_CANT[1]
-    ADD CX,2
-    MOV SI,CX
-    MOV BUFFER_CANT[SI],0
- 
-    CREAR_ARCHIVO RUTA_INV,32
-    ABRIR_ARCHIVO RUTA_INV,2
+
+    CREAR_ARCHIVO RUTA_INV, 0
+
+    ABRIR_ARCHIVO RUTA_INV, 2
     JC ERROR_ARC_DAN
- 
-    MOV ID_DAN,AX
-    
-    ; MOVER PUNTERO AL FINAL
-    MOV AH,42H
-    MOV AL,02H
-    MOV BX,ID_DAN
-    MOV CX,0
-    MOV DX,0
+    MOV ID_DAN, AX
+
+    MOV AH, 42H
+    MOV AL, 02H
+    MOV BX, ID_DAN
+    MOV CX, 0
+    MOV DX, 0
     INT 21H
-      
-;2.7.- AÑADIMOS EL CONTENIDO EN TXT
-ESCRIBIR_STOCK_DAN:
-    MOV BL,[BUFFER_NOMBRE+1]
-    MOV BH,0
-    ESCRIBIR_ARCHIVO ID_DAN,20,BUFFER_NOMBRE+2
-    ESCRIBIR_ARCHIVO ID_DAN,3,ESPACIO
-    MOV BL,[BUFFER_CANT+1]
-    MOV BH,0
-    ESCRIBIR_ARCHIVO ID_DAN,5,BUFFER_CANT+2 
-    ESCRIBIR_ARCHIVO ID_DAN,2,SALTO_LINEA    ; Verifica que SALTO_LINEA esté en el .DATA del main
-    CERRAR_ARCHIVO ID_DAN
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_NOMBRE[1]
+    MOV CH, 0
+    LEA DX, BUFFER_NOMBRE+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 3
+    LEA DX, ESPACIO
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_CANT[1]
+    MOV CH, 0
+    LEA DX, BUFFER_CANT+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 2
+    LEA DX, SALTO_LINEA
+    INT 21H
+
+    MOV AH, 3EH
+    MOV BX, ID_DAN
+    INT 21H
+
     INC CONTADOR_INV
-    JMP ADD_RECURSO_DAN
-  
-;2.8.- LÍMITE DEL INVENTARIO 
+    CURSOR 20, 15, 0
+    IMP_SINCOLOR MSJ_GUARDADO
+
+    JMP ADD_LOOP_DAN
+
 LIMITE_INV_DAN:
-    CURSOR 20,15,0
+    CURSOR 20, 15, 0
     IMP_SINCOLOR MSJ_LIMITE
     RASTREO
-    JMP INVENTARIO_DAN    
- 
-;2.9- SUBMENÚ DE LECTURA
-READ_DATA_DAN:
-    NEWPAGE
-    CURSOR 0,0,0
-    FONDO_COLOR 1EH,32
-    IMP_COLOR TIT_READ,29,0,0,2,22,1EH
- 
-    ABRIR_ARCHIVO RUTA_INV,0
-    JC ERROR_ARC_DAN
- 
-    MOV ID_DAN,AX
-    LEER_ARCHIVO ID_DAN,300,BUFFER_LECTURA
-    MOV BYTES_LEIDOS,AX 
-    
-    MOV SI,AX
-    MOV BUFFER_LECTURA[SI],'$'
-    CERRAR_ARCHIVO ID_DAN 
-    
-    MOV TOTAL_PRODUCTOS,0
-    MOV SI,0
-  
-CONTAR_PRODUCTOS_DAN:
-    CMP SI,BYTES_LEIDOS
-    JAE FIN_CONTADOR_DAN
-    MOV AL,BUFFER_LECTURA[SI]
-    CMP AL,13
-    JNE SIGUIENTE_BYTE_DAN
-    INC TOTAL_PRODUCTOS
-SIGUIENTE_BYTE_DAN:
-    INC SI
-    JMP CONTAR_PRODUCTOS_DAN
-    
-;2.10.- ELIMINAR INVENTARIO
-EDIT_DATA_DAN:
-    CREAR_ARCHIVO RUTA_INV,32
-    MOV CONTADOR_INV,0
-    MOV TOTAL_PRODUCTOS,0
-    CURSOR 20,15,0
-    IMP_SINCOLOR MSJ_ELIMINADO
-    RASTREO
     JMP INVENTARIO_DAN
- 
-FIN_CONTADOR_DAN:
-    MOV SI,0
-    MOV DH,5
-    MOV DL,10
- 
-MOSTRAR_REGISTROS_DAN:
-    CMP SI,BYTES_LEIDOS
-    JAE FIN_MOSTRAR_DAN
-    MOV AH,2
-    MOV BH,0
-    INT 10H
-    MOV AL,BUFFER_LECTURA[SI]
-    CMP AL,13
-    JE SALTO_LINEA_READ_DAN
-    CMP AL,10
-    JE CONTINUAR_READ_DAN
-    MOV AH,0EH
-    MOV BH,0
-    INT 10H
-    INC DL
- 
-CONTINUAR_READ_DAN:
-    INC SI
-    JMP MOSTRAR_REGISTROS_DAN
- 
-SALTO_LINEA_READ_DAN:
+
+; ================================================================
+; 2.9.- LEER INVENTARIO
+; ================================================================
+READ_DATA_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
+    NEWPAGE
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_READ_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
     INC DH
-    MOV DL,10
+    LOOP DAN_READ_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_READ, 29, 0, 0, 3, 24, 0AH
+
+    ABRIR_ARCHIVO RUTA_INV, 0
+    JC INVENTARIO_VACIO_DAN
+    MOV ID_DAN, AX
+
+    LEER_ARCHIVO ID_DAN, 300, BUFFER_LECTURA
+    MOV BYTES_LEIDOS, AX
+
+    MOV AH, 3EH
+    MOV BX, ID_DAN
+    INT 21H
+
+    CMP BYTES_LEIDOS, 0
+    JE INVENTARIO_VACIO_DAN
+
+    MOV TOTAL_PRODUCTOS, 0
+    MOV SI, 0
+
+DAN_CONTAR:
+    CMP SI, BYTES_LEIDOS
+    JAE DAN_CONTAR_FIN
+    MOV AL, BUFFER_LECTURA[SI]
+    CMP AL, 13
+    JNE DAN_CONTAR_NEXT
+    INC TOTAL_PRODUCTOS
+
+DAN_CONTAR_NEXT:
     INC SI
-    JMP MOSTRAR_REGISTROS_DAN
- 
-FIN_MOSTRAR_DAN:
-    IMP_COLOR OP1_READ,20,0,0,20,10,1EH
-    IMP_COLOR OP2_READ,12,0,0,22,10,1EH
-    IMP_COLOR OP_READ,4,0,0,24,10,1EH
- 
+    JMP DAN_CONTAR
+
+DAN_CONTAR_FIN:
+    MOV SI, 0
+    MOV DH, 6
+    MOV DL, 5
+
+DAN_PRINT_CHAR:
+    CMP SI, BYTES_LEIDOS
+    JAE DAN_IMP_FIN
+
+    MOV AL, BUFFER_LECTURA[SI]
+
+    CMP AL, 13
+    JE DAN_NUEVA_LINEA
+    CMP AL, 10
+    JE DAN_SIG_CHAR
+
+    MOV AH, 02H
+    MOV BH, 0
+    INT 10H
+
+    MOV AH, 0EH
+    MOV BH, 0
+    INT 10H
+
+    INC DL
+    JMP DAN_SIG_CHAR
+
+DAN_NUEVA_LINEA:
+    INC DH
+    MOV DL, 5
+
+DAN_SIG_CHAR:
+    INC SI
+    JMP DAN_PRINT_CHAR
+
+DAN_IMP_FIN:
+    IMP_COLOR OP1_READ, 20, 0, 0, 20, 15, 0FH
+    IMP_COLOR OP2_READ, 12, 0, 0, 21, 15, 0FH
+    IMP_COLOR OP_READ, 4, 0, 0, 22, 15, 0EH
+    JMP READ_OP_DAN
+
+INVENTARIO_VACIO_DAN:
+    MOV TOTAL_PRODUCTOS, 0
+    CURSOR 10, 20, 0
+    IMP_SINCOLOR MSJ_BITACORA_VACIA
+    IMP_COLOR OP2_READ, 12, 0, 0, 21, 15, 0FH
+    IMP_COLOR OP_READ, 4, 0, 0, 22, 15, 0EH
+
 READ_OP_DAN:
-    CURSOR 24,15,0
+    CURSOR 22, 20, 0
     LECTURA_CADENA OPDB_READ
-    CMP OPDB_READ+2,'1'
+
+    CMP OPDB_READ+2, '1'
     JE LCD_DAN
-    CMP OPDB_READ+2,'2'
+    CMP OPDB_READ+2, '2'
     JE INVENTARIO_DAN
-    JMP READ_OP_DAN 
- 
-;2.11.- MOSTRAR DATA EN LCD    
+    JMP READ_OP_DAN
+
+; ================================================================
+; 2.11.- LCD Y LEDS
+; ================================================================
 LCD_DAN:
-    MOV DX,2040H
-    MOV AL,'T'
-    OUT DX,AL
+    MOV DX, 2040H
+
+    MOV AL, 'T'
+    OUT DX, AL
     INC DX
-    MOV AL,'O'
-    OUT DX,AL
+    MOV AL, 'O'
+    OUT DX, AL
     INC DX
-    MOV AL,'T'
-    OUT DX,AL
+    MOV AL, 'T'
+    OUT DX, AL
     INC DX
-    MOV AL,'A'
-    OUT DX,AL
+    MOV AL, 'A'
+    OUT DX, AL
     INC DX
-    MOV AL,'L'
-    OUT DX,AL
+    MOV AL, 'L'
+    OUT DX, AL
     INC DX
-    MOV AL,' '
-    OUT DX,AL
+    MOV AL, ' '
+    OUT DX, AL
     INC DX
-    MOV AL,'I'
-    OUT DX,AL
+    MOV AL, 'I'
+    OUT DX, AL
     INC DX
-    MOV AL,'N'
-    OUT DX,AL
+    MOV AL, 'N'
+    OUT DX, AL
     INC DX
-    MOV AL,'S'
-    OUT DX,AL
+    MOV AL, 'S'
+    OUT DX, AL
     INC DX
-    MOV AL,'U'
-    OUT DX,AL
+    MOV AL, 'U'
+    OUT DX, AL
     INC DX
-    MOV AL,'M'
-    OUT DX,AL
+    MOV AL, 'M'
+    OUT DX, AL
     INC DX
-    MOV AL,'O'
-    OUT DX,AL
+    MOV AL, 'O'
+    OUT DX, AL
     INC DX
-    MOV AL,'S'
-    OUT DX,AL
+    MOV AL, 'S'
+    OUT DX, AL
     INC DX
-    MOV AL,':'
-    OUT DX,AL
+    MOV AL, ':'
+    OUT DX, AL
     INC DX
-    MOV AL,' '
-    OUT DX,AL
+    MOV AL, ' '
+    OUT DX, AL
     INC DX
-    MOV AL,TOTAL_PRODUCTOS
-    ADD AL,30H
-    OUT DX,AL 
-    
-    ; 2.12.- SALIDA DE LEDS
-    MOV DX,2070H
-    MOV BL,TOTAL_PRODUCTOS
-    CMP BL,0
+
+    MOV AL, TOTAL_PRODUCTOS
+    ADD AL, 30H
+    OUT DX, AL
+
+    MOV DX, 2070H
+    MOV BL, TOTAL_PRODUCTOS
+
+    CMP BL, 0
     JE APAGAR_LEDS_DAN
-    MOV AL,1
- 
+
+    MOV AL, 1
+
 GENERAR_BITS_DAN:
-    CMP BL,1
+    CMP BL, 1
     JE MOSTRAR_LEDS_DAN
-    SHL AL,1
+    SHL AL, 1
     INC AL
     DEC BL
     JMP GENERAR_BITS_DAN
- 
+
 MOSTRAR_LEDS_DAN:
-    OUT DX,AL
+    OUT DX, AL
     JMP FIN_LEDS_DAN
- 
+
 APAGAR_LEDS_DAN:
-    MOV AL,0
-    OUT DX,AL
- 
+    MOV AL, 0
+    OUT DX, AL
+
 FIN_LEDS_DAN:
-    CURSOR 26,10,0
+    CURSOR 23, 15, 0
     IMP_SINCOLOR MSJ_LCD
     RASTREO
     JMP READ_OP_DAN
-    
-;3.- MÓDULO DE RIEGO
+
+; ================================================================
+; 2.10.- ELIMINAR INVENTARIO
+; ================================================================
+EDIT_DATA_DAN:
+
+    MOV BX, 5
+
+CERRAR_HANDLES_DAN:
+    MOV AH, 3EH
+    INT 21H
+
+    INC BX
+    CMP BX, 30
+    JBE CERRAR_HANDLES_DAN
+
+    MOV AH, 41H
+    LEA DX, RUTA_INV
+    INT 21H
+
+    MOV AH, 3CH
+    MOV CX, 0
+    LEA DX, RUTA_INV
+    INT 21H
+    JC ERROR_EDIT_DAN
+
+    MOV ID_DAN, AX
+
+    MOV AH, 3EH
+    MOV BX, ID_DAN
+    INT 21H
+
+    MOV CONTADOR_INV, 0
+    MOV TOTAL_PRODUCTOS, 0
+
+    CURSOR 20, 15, 0
+    IMP_SINCOLOR MSJ_ELIMINADO
+    RASTREO
+    JMP INVENTARIO_DAN
+
+ERROR_EDIT_DAN:
+    CURSOR 20, 15, 0
+    IMP_SINCOLOR MSJERRORARC
+    RASTREO
+    JMP INVENTARIO_DAN
+
+; ================================================================
+; 3.- RIEGO
+; ================================================================
 RIEGO_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    CURSOR 0,0,0
-    FONDO_COLOR 1EH,32
-    IMP_COLOR TIT_RIEGO,24,0,0,2,22,1EH
-    IMP_COLOR OP1_RIEGO,17,0,0,6,25,1EH
-    IMP_COLOR OP2_RIEGO,17,0,0,8,25,1EH
-    IMP_COLOR OP3_RIEGO,16,0,0,10,25,1EH
-    IMP_COLOR OP4_RIEGO,12,0,0,12,25,1EH
-    IMP_COLOR MSG_RIEGO_OP,4,0,0,16,25,1EH
-  
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_RIEGO_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_RIEGO_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_RIEGO, 24, 0, 0, 3, 27, 0AH
+    IMP_COLOR OP1_RIEGO, 17, 0, 0, 7, 25, 0FH
+    IMP_COLOR OP2_RIEGO, 17, 0, 0, 9, 25, 0FH
+    IMP_COLOR OP3_RIEGO, 16, 0, 0, 11, 25, 0FH
+    IMP_COLOR OP4_RIEGO, 12, 0, 0, 13, 25, 0FH
+    IMP_COLOR MSG_RIEGO_OP, 4, 0, 0, 16, 25, 0EH
+
 RIEGO_OP_DAN:
-    CURSOR 16,30,0
+    CURSOR 16, 30, 0
     LECTURA_CADENA OPDB_RIEGO
-    CMP OPDB_RIEGO+2,'1'
+
+    CMP OPDB_RIEGO+2, '1'
     JE INICIAR_RIEGO_DAN
-    CMP OPDB_RIEGO+2,'2'
+    CMP OPDB_RIEGO+2, '2'
     JE DETENER_RIEGO_DAN
-    CMP OPDB_RIEGO+2,'3'
+    CMP OPDB_RIEGO+2, '3'
     JE MENU_BITACORA_DAN
-    CMP OPDB_RIEGO+2,'4'
-    JE MENU_MAIN_INVENTARIO    ; Regresa al menú de Daniel
+    CMP OPDB_RIEGO+2, '4'
+    JE MENU_MAIN_INVENTARIO
     JMP ERROR_RIEGO_DAN
-    
-;3.2.- PROCESO DE RIEGO
+
 INICIAR_RIEGO_DAN:
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJ_RIEGO_ON
- 
+
 GIRO_MOTOR_DAN:
 ESPERA1_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA1_DAN
-    MOV AL,00000001B
-    OUT 7,AL
+    MOV AL, 00000001B
+    OUT 7, AL
+
 ESPERA2_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA2_DAN
-    MOV AL,00000011B
-    OUT 7,AL
+    MOV AL, 00000011B
+    OUT 7, AL
+
 ESPERA3_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA3_DAN
-    MOV AL,00000010B
-    OUT 7,AL
+    MOV AL, 00000010B
+    OUT 7, AL
+
 ESPERA4_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA4_DAN
-    MOV AL,00000110B
-    OUT 7,AL
+    MOV AL, 00000110B
+    OUT 7, AL
+
 ESPERA5_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA5_DAN
-    MOV AL,00000100B
-    OUT 7,AL
+    MOV AL, 00000100B
+    OUT 7, AL
+
 ESPERA6_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA6_DAN
-    MOV AL,00001100B
-    OUT 7,AL
+    MOV AL, 00001100B
+    OUT 7, AL
+
 ESPERA7_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA7_DAN
-    MOV AL,00001000B
-    OUT 7,AL
+    MOV AL, 00001000B
+    OUT 7, AL
+
 ESPERA8_DAN:
-    IN AL,7
-    TEST AL,10000000B
+    IN AL, 7
+    TEST AL, 10000000B
     JZ ESPERA8_DAN
-    MOV AL,00001001B
-    OUT 7,AL
- 
-    MOV AH,01H
+    MOV AL, 00001001B
+    OUT 7, AL
+
+    MOV AH, 01H
     INT 16H
     JZ GIRO_MOTOR_DAN
-    MOV AH,00H
+
+    MOV AH, 00H
     INT 16H
-    CMP AL,'2'
+    CMP AL, '2'
     JE DETENER_RIEGO_DAN
     JMP GIRO_MOTOR_DAN
- 
-;3.4.- APAGAR MOTOR
+
 DETENER_RIEGO_DAN:
-    MOV AL, 00H        
+    MOV AL, 00H
     OUT 7, AL
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJ_RIEGO_OFF
-    RASTREO            
+    RASTREO
     JMP RIEGO_DAN
- 
-;4.- BITÁCORA
+
+; ================================================================
+; 4.- BITACORA CORREGIDA FINAL
+; ================================================================
 MENU_BITACORA_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    CURSOR 0,0,0
-    FONDO_COLOR 1EH,32
-    IMP_COLOR TIT_BITACORA,18,0,0,2,28,1EH      ; Sin '$' porque IMP_COLOR usa longitud
-    IMP_COLOR OP1_BITACORA,22,0,0,6,22,1EH
-    IMP_COLOR OP2_BITACORA,18,0,0,8,22,1EH
-    IMP_COLOR OP3_BITACORA,14,0,0,10,22,1EH
-    IMP_COLOR MSG_BITACORA_OP,4,0,0,14,22,1EH
- 
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_BIT_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_BIT_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+
+    IMP_COLOR TIT_BITACORA,    16, 0, 0,  3, 31, 0AH
+    IMP_COLOR OP1_BITACORA,    19, 0, 0,  7, 25, 0FH
+    IMP_COLOR OP2_BITACORA,    16, 0, 0,  9, 25, 0FH
+    IMP_COLOR OP3_BITACORA,    12, 0, 0, 11, 25, 0FH
+    IMP_COLOR MSG_BITACORA_OP,  3, 0, 0, 14, 25, 0EH
+
 BITACORA_OP_DAN:
-    CURSOR 14,28,0
+    CURSOR 14, 30, 0
     LECTURA_CADENA OPDB_BITACORA
-    CMP OPDB_BITACORA+2,'1'
-    JE EDITAR_BITACORA_DAN
-    CMP OPDB_BITACORA+2,'2'
+
+    CMP OPDB_BITACORA+2, '1'
+    JE CREAR_BITACORA_FORM_DAN
+
+    CMP OPDB_BITACORA+2, '2'
     JE MOSTRAR_BITACORA_DAN
-    CMP OPDB_BITACORA+2,'3'
+
+    CMP OPDB_BITACORA+2, '3'
     JE RIEGO_DAN
+
     JMP BITACORA_OP_DAN
- 
-EDITAR_BITACORA_DAN:
+
+; ================================================================
+; 4.1.- CREAR / REEMPLAZAR BITACORA
+; ================================================================
+CREAR_BITACORA_FORM_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    CURSOR 4,10,0
-    IMP_SINCOLOR TIT_BITACORA
-    CURSOR 8,5,0
-    LECTURA_CADENA BUFFER_BITACORA
-    CREAR_ARCHIVO RUTA_BITACORA,32
-    ABRIR_ARCHIVO RUTA_BITACORA,2
-    JC ERROR_ARC_DAN
-    MOV ID_DAN,AX
-    MOV AH,42H
-    MOV AL,02H
-    MOV BX,ID_DAN
-    MOV CX,0
-    MOV DX,0
+
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_FORM_BIT_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_FORM_BIT_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_EDICION_BITACORA, 28, 0, 0, 3, 25, 0AH
+
+    ; Crear o reemplazar BITACORA.TXT
+    MOV AH, 3CH
+    MOV CX, 0
+    LEA DX, RUTA_BITACORA
     INT 21H
-    MOV BL,BUFFER_BITACORA[1]
-    MOV BH,0
-    ESCRIBIR_ARCHIVO ID_DAN,BX,BUFFER_BITACORA+2
-    ESCRIBIR_ARCHIVO ID_DAN,2,SALTO_LINEA
-    CERRAR_ARCHIVO ID_DAN
-    CURSOR 20,10,0
-    IMP_SINCOLOR MSJ_GUARDADO
+    JC ERROR_ARC_DAN
+
+    MOV ID_DAN, AX
+
+    ; DIA DE REGISTRO
+    CURSOR 6, 8, 0
+    IMP_SINCOLOR MSJ_DIA_REG
+    CURSOR 6, 28, 0
+    LECTURA_CADENA BUFFER_BITACORA
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 17
+    LEA DX, TXT_DIA_REG
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_BITACORA[1]
+    MOV CH, 0
+    LEA DX, BUFFER_BITACORA+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 2
+    LEA DX, SALTO_LINEA
+    INT 21H
+
+    ; TITULO DE BITACORA
+    CURSOR 9, 8, 0
+    IMP_SINCOLOR MSJ_TITULO_BIT
+    CURSOR 9, 30, 0
+    LECTURA_CADENA BUFFER_BITACORA
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 20
+    LEA DX, TXT_TITULO_BIT
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_BITACORA[1]
+    MOV CH, 0
+    LEA DX, BUFFER_BITACORA+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 2
+    LEA DX, SALTO_LINEA
+    INT 21H
+
+    ; CONTENIDO
+    CURSOR 12, 8, 0
+    IMP_SINCOLOR MSJ_CONTENIDO_BIT
+    CURSOR 12, 22, 0
+    LECTURA_CADENA BUFFER_BITACORA
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 11
+    LEA DX, TXT_CONTENIDO_BIT
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_BITACORA[1]
+    MOV CH, 0
+    LEA DX, BUFFER_BITACORA+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 2
+    LEA DX, SALTO_LINEA
+    INT 21H
+
+    ; FIRMA
+    CURSOR 15, 8, 0
+    IMP_SINCOLOR MSJ_FIRMA_BIT
+    CURSOR 15, 18, 0
+    LECTURA_CADENA BUFFER_BITACORA
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 7
+    LEA DX, TXT_FIRMA_BIT
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CL, BUFFER_BITACORA[1]
+    MOV CH, 0
+    LEA DX, BUFFER_BITACORA+2
+    INT 21H
+
+    MOV AH, 40H
+    MOV BX, ID_DAN
+    MOV CX, 2
+    LEA DX, SALTO_LINEA
+    INT 21H
+
+    ; Cerrar archivo
+    MOV AH, 3EH
+    MOV BX, ID_DAN
+    INT 21H
+
+    ; Marcar que ya existe bitacora en esta ejecucion
+    MOV BITACORA_CREADA, 1
+
+    CURSOR 20, 15, 0
+    IMP_SINCOLOR MSJ_BIT_GENERADA
     RASTREO
     JMP MENU_BITACORA_DAN
- 
+
+; ================================================================
+; 4.2.- MOSTRAR BITACORA SIN ERROR DE ARCHIVO
+; ================================================================
 MOSTRAR_BITACORA_DAN:
+    BORRAR_SECCION 07H,0,0,24,79
     NEWPAGE
-    ABRIR_ARCHIVO RUTA_BITACORA,0
+
+    IMP_COLOR marco_sup, 78, 0, 0, 0, 1, 02H
+    MOV CX, 23
+    MOV DH, 1
+
+DAN_SHOW_BIT_LADOS:
+    PUSH CX
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 1, 02H
+    IMP_COLOR borde_lat, 1, 0, 0, DH, 78, 02H
+    POP CX
+    INC DH
+    LOOP DAN_SHOW_BIT_LADOS
+
+    IMP_COLOR marco_inf, 78, 0, 0, 24, 1, 02H
+    IMP_COLOR TIT_MOSTRAR_BITACORA, 29, 0, 0, 3, 24, 0AH
+
+    ; Si no se ha creado bitacora en esta ejecucion,
+    ; no intentamos abrir archivo para evitar error de EMU8086.
+    CMP BITACORA_CREADA, 1
+    JNE NO_EXISTE_BITACORA_DAN
+
+    ; Abrir archivo
+    MOV AH, 3DH
+    MOV AL, 00H
+    LEA DX, RUTA_BITACORA
+    INT 21H
     JC NO_EXISTE_BITACORA_DAN
-    MOV ID_DAN,AX
-    LEER_ARCHIVO ID_DAN,500,LECTURA_BITACORA 
-    CMP BYTES_LEIDOS,0
+
+    MOV ID_DAN, AX
+
+    ; Leer archivo
+    MOV AH, 3FH
+    MOV BX, ID_DAN
+    MOV CX, 500
+    LEA DX, LECTURA_BITACORA
+    INT 21H
+    JC ERROR_ARC_DAN
+
+    MOV BYTES_LEIDOS, AX
+
+    ; Cerrar archivo
+    MOV AH, 3EH
+    MOV BX, ID_DAN
+    INT 21H
+
+    CMP BYTES_LEIDOS, 0
     JE BITACORA_VACIA_DAN
-    MOV BYTES_LEIDOS,AX
-    MOV SI,AX
-    MOV LECTURA_BITACORA[SI],'$'
-    CERRAR_ARCHIVO ID_DAN
-    CURSOR 2,5,0
-    IMP_SINCOLOR TIT_BITACORA
-    CURSOR 5,5,0
-    IMP_SINCOLOR LECTURA_BITACORA
+
+    MOV SI, 0
+    MOV DH, 6
+    MOV DL, 8
+
+DAN_BIT_PRINT:
+    CMP SI, BYTES_LEIDOS
+    JAE DAN_BIT_IMP_FIN
+
+    MOV AL, LECTURA_BITACORA[SI]
+
+    CMP AL, 13
+    JE DAN_BIT_NUEVA_LINEA
+
+    CMP AL, 10
+    JE DAN_BIT_SIG_CHAR
+
+    MOV AH, 02H
+    MOV BH, 0
+    INT 10H
+
+    MOV AH, 0EH
+    MOV BH, 0
+    INT 10H
+
+    INC DL
+    JMP DAN_BIT_SIG_CHAR
+
+DAN_BIT_NUEVA_LINEA:
+    INC DH
+    MOV DL, 8
+
+DAN_BIT_SIG_CHAR:
+    INC SI
+    JMP DAN_BIT_PRINT
+
+DAN_BIT_IMP_FIN:
+    CURSOR 21, 15, 0
+    IMP_SINCOLOR msg_paus
     RASTREO
     JMP MENU_BITACORA_DAN
- 
+
 NO_EXISTE_BITACORA_DAN:
-    CURSOR 20,10,0
-    IMP_SINCOLOR MSJ_CREAR_BIT
+    CURSOR 12, 12, 0
+    IMP_SINCOLOR MSJ_SIN_BITACORA
+    CURSOR 14, 12, 0
+    IMP_SINCOLOR msg_paus
     RASTREO
-    JMP MENU_BITACORA_DAN 
- 
+    JMP MENU_BITACORA_DAN
+
 BITACORA_VACIA_DAN:
-    CERRAR_ARCHIVO ID_DAN
-    CURSOR 20,10,0
-    IMP_SINCOLOR MSJ_BITACORA_VACIA
+    CURSOR 12, 12, 0
+    IMP_SINCOLOR MSJ_SIN_BITACORA
+    CURSOR 14, 12, 0
+    IMP_SINCOLOR msg_paus
     RASTREO
-    JMP MENU_BITACORA_DAN    
- 
-; ---- MANEJADORES DE ERROR ----
+    JMP MENU_BITACORA_DAN
+
+; ================================================================
+; ERRORES
+; ================================================================
 ERROR_DAN:
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJERROR_DAN
     JMP OP_MAIN_DAN
-    
+
 ERROR_INV_DAN:
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJERRORINV
     JMP INVENTARIO_OP_DAN
-    
+
 ERROR_ARC_DAN:
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJERRORARC
-    JMP FIN_DANIEL          ; Error de archivo -> regresa al menú principal
-    
+    RASTREO
+    JMP FIN_DANIEL
+
 ERROR_RIEGO_DAN:
-    CURSOR 20,20,0
+    CURSOR 20, 20, 0
     IMP_SINCOLOR MSJ_ERROR_RIEGO
     JMP RIEGO_OP_DAN
- 
-; ---- PUNTO DE SALIDA DEL MÓDULO ----
+
 FIN_DANIEL:
-    RET                     ; <-- Regresa a MENU_PRINCIPAL en el main
- 
+    RET
+
 PROCESO_DANIEL ENDP
