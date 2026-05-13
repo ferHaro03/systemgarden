@@ -207,7 +207,20 @@ INCLUDE biblioteca.txt
     MSJ_BITACORA_VACIA DB 'NO HAY CONTENIDO EN LA BITACORA$'
     TIT_EDICION_BITACORA DB '=== MODO EDICION BITACORA ===$'
     TIT_MOSTRAR_BITACORA DB '=== CONTENIDO DE BITACORA ===$'
+     
+    MSJ_DIA_REG        DB 'DIA DE REGISTRO: $'
+    MSJ_TITULO_BIT     DB 'TITULO DE BITACORA: $'
+    MSJ_CONTENIDO_BIT  DB 'CONTENIDO: $'
+    MSJ_FIRMA_BIT      DB 'FIRMA: $'
+    MSJ_BIT_GENERADA   DB 'BITACORA GENERADA CORRECTAMENTE.$'
+    MSJ_SIN_BITACORA   DB 'TODAVIA NO HAS CREADO NINGUNA BITACORA.$'
 
+    TXT_DIA_REG        DB 'DIA DE REGISTRO: '
+    TXT_TITULO_BIT     DB 'TITULO DE BITACORA: '
+    TXT_CONTENIDO_BIT  DB 'CONTENIDO: '
+    TXT_FIRMA_BIT      DB 'FIRMA: '         
+       
+    BITACORA_CREADA DB 0           
     ; ====================================================
     ; --- VARIABLES DEL MODULO 2: CLIMA (ENCISO) ---
     ; ==================================================== 
