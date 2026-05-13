@@ -79,7 +79,7 @@ INCLUDE biblioteca.txt
     opt_1          db ' [1] Gestion de Inventario ' 
     opt_2          db ' [2] Monitoreo Climatico '   
     opt_3          db ' [3] Control de termometro   ' ; 40 letras
-    opt_4          db ' [4] Automatizaciónes      '
+    opt_4          db ' [4] Automatizaciï¿½nes      '
     opt_5          db ' [5] Ver Historial de Accesos '         
     opt_6          db ' [6] Salir de SystemGarden '          
     
@@ -114,7 +114,7 @@ INCLUDE biblioteca.txt
     
     pasos_rumba  db 1   ; longitud del tramo actual
     giros_rumba  db 0   ; contador de giros realizados
-    limite_rumba db 6   ; tamaño máximo de espiral (6 = cubre buen área)
+    limite_rumba db 6   ; tamaï¿½o mï¿½ximo de espiral (6 = cubre buen ï¿½rea)
     cont_pasos   db 0 
     
     ; --- CONFIGURACIÃ“N DE SEGUNDO ARCHIVO ---
@@ -225,12 +225,12 @@ INCLUDE biblioteca.txt
     ; ==================================================== 
     
     val_temp_raw     db 0  
-    ; --- Codigos para Traffic Lights ---
+    ; --- Cï¿½digos para Traffic Lights ---
     ; Puerto 4 - Word de 16 bits
     
-    SEM_ROJO        EQU 0249h   ; Todos los semÃ¡foros en rojo
-    SEM_AMARILLO    EQU 0492h   ; Todos los semÃ¡foros en amarillo
-    SEM_VERDE       EQU 0924h   ; Todos los semÃ¡foros en verde       
+    SEM_ROJO        EQU 0249h   ; Todos los semï¿½foros en rojo
+    SEM_AMARILLO    EQU 0492h   ; Todos los semï¿½foros en amarillo
+    SEM_VERDE       EQU 0924h   ; Todos los semï¿½foros en verde       
     ID               dw 0            ; Manejador de archivos 
     fila_aux         db 0            ; Auxiliar para dibujo de marco 
     ruta_clima       DB 'C:\SYSTGARD\ENCISO\clima.txt', 0
@@ -238,30 +238,35 @@ INCLUDE biblioteca.txt
     
     ; Formatos del Historial (Conteo de caracteres exacto para macros)
     msj_log_estable  db 'SISTEMA ESTABLE HORA:      ' ; Rellenado a 28 letras
-    msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
-    hora_txt         db '00:00'                   ; 5 letras 
-    msj_log_fin      db ' FUE: '                  ; 6 letras 
-
-    salto_linea      db 13, 10                  ; 2 letras 
+    msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; Ya mide 28 chars
+    hora_txt         db '00:00'                   ; 5 letras [cite: 1463]
+    msj_log_fin      db ' FUE: '                  ; 6 letras [cite: 1466]
+    salto_linea      DB 13, 10, 20 DUP(' ')                 ; 2 letras [cite: 1441]
     
     ; Datos y Buffers
     temp_ascii       db '00', '$' 
-    buffer_clima     db 400 dup('$') ; Capacidad para ~10 registros largos 
+    buffer_clima     db 400 dup('$') ; Capacidad para ~10 registros largos
+    ; --- Limite de registros del historial ---
+    MAX_REG_CLIMA     EQU 5
+    contador_reg      db 0
+    msj_limite_reg    db ' [LIMITE] Ya existen 5 registros. Borra el historial. $' 
     
     ; Interfaz de Pantalla
     txt_clima_tit      db ' < // CLIM/\TE MONITORING SYSTEM // > ' 
     lbl_temp_act       db ' TEMPERATURE RE/\DING: [    ] C '          
     msj_estado_ok      db ' SYSTEM ST/\TUS: [ OPTIMAL ] '            
     msj_alerta_crt     db ' SYSTEM ST/\TUS: [ CRITICAL ] '           
-    msj_clima_menu     db ' [1] LOG [2] CLIMA [3] ALERTAS [4] EXIT'  
+    msj_clima_menu     db ' [1] LOG [2] CLIMA [3] ALERTAS [4] EXIT [5] BORRAR --'  
     msj_hist_alertas   db ' --- CRITICAL ALERTS HISTORY --- ' ;
     msj_lect_hist      db ' --- SYSTEM RE/\DINGS HISTORY --- '  
     msj_lcd_alerta     DB 'ALERTA    '
     msj_estado_alerta  DB ' SYSTEM ST/\TUS: [   ALERT ] '    
     msj_lcd_ok         db 'SYSTEM: OK$'      
     msj_lcd_warn       db '!! ALERT !!$'
-    msj_error_arc      db 'OCURRIO UN ERROR CON EL ARCHIVO  $' ; Error tÃ©cnico 
-    msj_vacio_e        db ' [INFO] Sin registros guardados aun.  $' ; Sin datos  
+    msj_error_arc      db 'OCURRIO UN ERROR CON EL ARCHIVO  $' ; Error tï¿½cnico 
+    msj_vacio_e        db ' [INFO] Sin registros guardados aun.  $' ; Sin datos
+    msj_borrar_ok      db ' [OK] Historial de clima y alertas eliminado. $'
+    msj_reg_guardado   db ' [OK] Registro guardado correctamente. $'  
     
     ; ==================================================== 
     ; TERMOMETRO MODULO    
@@ -286,8 +291,8 @@ INICIO:
     MOV ES,AX
 
     ; --- FASE 1: INICIALIZACION DE DIRECTORIOS ---
-     ;LIMPIAR_PANTALLA
-     ;CALL MODULO_BOOT
+    LIMPIAR_PANTALLA
+    ;CALL MODULO_BOOT
 
     ; --- FASE 2: INTERFAZ DE ACCESO ---
     LIMPIAR_PANTALLA
