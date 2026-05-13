@@ -104,10 +104,9 @@ INCLUDE biblioteca.txt
     ; --- MODULO ROBOTICA (FERNANDO) ---
     ; ====================================================
     txt_rob_tit db ' < // M0DULO DE AUTOMATIZACION // > ' ; 36 letras
-    rob_opt1    db ' [1] Abrir Valvula Riego (Stepper)  ' ; 36 letras
-    rob_opt2    db ' [2] Desplegar Robot Recolector     ' ; 36 letras
+    rob_opt1    db ' [1] Desplegar Robot Recolector     ' ; 36 letras
+    rob_opt2    db ' [2] Generar Reporte Impreso (TXT)  ' ; 36 letras
     rob_opt3    db ' [3] Volver al Panel Principal      ' ; 36 letras
-    rob_opt4    db ' [4] Generar Reporte Impreso (TXT)  ' ; 36 letras
     
     rob_msg1    db ' [!] Pressure Gauge activado...     ' ; 36 letras
     rob_msg2    db ' [!] Robot en movimiento...         ' ; 36 letras
@@ -226,7 +225,7 @@ INCLUDE biblioteca.txt
     ; ==================================================== 
     
     val_temp_raw     db 0  
-    ; --- Códigos para Traffic Lights ---
+    ; --- Codigos para Traffic Lights ---
     ; Puerto 4 - Word de 16 bits
     
     SEM_ROJO        EQU 0249h   ; Todos los semáforos en rojo
@@ -286,8 +285,8 @@ INICIO:
     MOV ES,AX
 
     ; --- FASE 1: INICIALIZACION DE DIRECTORIOS ---
-     ;LIMPIAR_PANTALLA
-     ;CALL MODULO_BOOT
+    LIMPIAR_PANTALLA
+    CALL MODULO_BOOT
 
     ; --- FASE 2: INTERFAZ DE ACCESO ---
     LIMPIAR_PANTALLA

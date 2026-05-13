@@ -24,7 +24,6 @@ dib_lados_rob:
     IMP_COLOR rob_opt1, 36, 0, 0, 8, 22, 0FH     
     IMP_COLOR rob_opt2, 36, 0, 0, 10, 22, 0FH
     IMP_COLOR rob_opt3, 36, 0, 0, 12, 22, 0FH
-    IMP_COLOR rob_opt4, 36, 0, 0, 14, 22, 0FH
     IMP_COLOR prompt_sel, 29, 0, 0, 18, 25, 0EH  
 
 seleccionar_rob:
@@ -32,13 +31,11 @@ seleccionar_rob:
     RASTREO                 
     
     CMP AL, '1'
-    JE activar_presion
-    CMP AL, '2'
     JE activar_robot
+    CMP AL, '2'
+    JE llamar_impresora
     CMP AL, '3'
     JE salir_robotica
-    CMP AL, '4'
-    JE llamar_impresora
     JMP seleccionar_rob    
 
 llamar_impresora:
