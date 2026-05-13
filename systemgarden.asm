@@ -4,9 +4,9 @@
 ; EQUIPO: Fernando, Daniel, Enciso, Victor
 ;***************************************
 
-#start=stepper_motor.exe#
 #start=robot.exe#
 #start=printer.exe#
+#start=emulation kit.exe#
 
 INCLUDE biblioteca.txt
  
@@ -107,9 +107,15 @@ INCLUDE biblioteca.txt
     rob_opt3    db ' [3] Volver al Panel Principal      ' ; 36 letras
     rob_opt4    db ' [4] Generar Reporte Impreso (TXT)  ' ; 36 letras
     
-    rob_msg1    db ' [!] Motor Stepper activado...      ' ; 36 letras
+    rob_msg1    db ' [!] Pressure Gauge activado...     ' ; 36 letras
     rob_msg2    db ' [!] Robot en movimiento...         ' ; 36 letras
-
+    rob_msg3    db ' [!] Robot Rumba activado...        ' ; 36 letras
+    
+    pasos_rumba  db 1   ; longitud del tramo actual
+    giros_rumba  db 0   ; contador de giros realizados
+    limite_rumba db 6   ; tamaño máximo de espiral (6 = cubre buen área)
+    cont_pasos   db 0 
+    
     ; --- CONFIGURACIÃ“N DE SEGUNDO ARCHIVO ---
     file_sensores  db 'C:\SYSTGARD\FERNANDO\sensores.txt', 0
     handle_sens    dw ?
@@ -222,7 +228,6 @@ INCLUDE biblioteca.txt
     msj_log_alerta   db '!! ALERTA CRITICA !! HORA:  ' ; 28 letras
     hora_txt         db '00:00'                   ; 5 letras 
     msj_log_fin      db ' FUE: '                  ; 6 letras 
-    salto_linea      DB 13, 10                  ; 2 letras 
     
     ; Datos y Buffers
     temp_ascii       db '00', '$' 
@@ -280,7 +285,6 @@ INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
 INCLUDE Fernando\robotica.asm
-INCLUDE Fernando\logs.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm
 
