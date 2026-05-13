@@ -1,13 +1,14 @@
 MODULO_TERMOMETRO PROC
     interfaz_termometro:
-        LIMPIAR_PANTALLA               
-        imp_color interfazTemperatura1, 24, 0, 0, 0, 0, 4eh
-        imp_color interfazTemperatura2, 24, 0, 0, 1, 0, 4eh
-        imp_color interfazTemperatura3, 24, 0, 0, 2, 0, 4eh
-        imp_color interfazTemperatura4, 24, 0, 0, 3, 0, 4eh
-        imp_color interfazTemperatura5, 24, 0, 0, 4, 0, 4eh
-        imp_color interfazTemperatura6, 24, 0, 0, 5, 0, 4eh
-        cursor 5, 8, 0 
+        LIMPIAR_PANTALLA
+        imp_color interfazTemperaturaTitulo, 22, 0, 0, 1, 26, 2ah               
+        imp_color interfazTemperatura1, 24, 0, 0, 3, 25, 4eh
+        imp_color interfazTemperatura2, 24, 0, 0, 5, 25, 4eh
+        imp_color interfazTemperatura3, 24, 0, 0, 7, 25, 4eh
+        imp_color interfazTemperatura4, 24, 0, 0, 9, 25, 4eh
+        imp_color interfazTemperatura5, 24, 0, 0, 11, 25, 4eh
+        imp_color interfazTemperatura6, 24, 0, 0, 13, 25, 4eh
+        cursor 13, 33, 0 
         leerCaracter opcion_temperatura 
         
         cmp opcion_temperatura, '1'
@@ -123,4 +124,5 @@ MODULO_TERMOMETRO PROC
             jmp interfaz_termometro
                                
     finTermometro: 
+        ret
 MODULO_TERMOMETRO ENDP

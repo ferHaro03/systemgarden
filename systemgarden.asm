@@ -246,6 +246,7 @@ INCLUDE biblioteca.txt
     ; ==================================================== 
     ; TERMOMETRO MODULO    
     ; ====================================================  
+    interfazTemperaturaTitulo db 'Control de Temperatura'
     interfazTemperatura1    db 'Seleccione una opcion:  '
     interfazTemperatura2    db '[1] Encender            '
     interfazTemperatura3    db '[2] Apagar              '
@@ -265,8 +266,8 @@ INICIO:
     MOV ES,AX
 
     ; --- FASE 1: INICIALIZACION DE DIRECTORIOS ---
-     ;LIMPIAR_PANTALLA
-     ;CALL MODULO_BOOT
+     LIMPIAR_PANTALLA
+     CALL MODULO_BOOT
 
     ; --- FASE 2: INTERFAZ DE ACCESO ---
     LIMPIAR_PANTALLA
@@ -295,7 +296,6 @@ INCLUDE Fernando\menu_principal.asm
 INCLUDE Fernando\logs.asm  
 INCLUDE Fernando\robotica.asm 
 INCLUDE Victor\termometro.asm
-INCLUDE Fernando\logs.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm
 
