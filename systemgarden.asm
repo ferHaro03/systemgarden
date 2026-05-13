@@ -313,9 +313,9 @@ FIN:
 INCLUDE Fernando\login.asm
 INCLUDE Fernando\boot.asm
 INCLUDE Fernando\menu_principal.asm
-INCLUDE Fernando\logs.asm  
+INCLUDE Fernando\logs.asm
+INCLUDE Victor\termometro.asm  
 INCLUDE Fernando\robotica.asm
-INCLUDE Victor\termometro.asm
 INCLUDE Daniel\inventario.asm
 INCLUDE Enciso\clima.asm
 
