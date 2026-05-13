@@ -7,8 +7,8 @@
 #start=robot.exe#
 #start=printer.exe#
 #start=emulation kit.exe#
-#start=Thermometer.exe#  
-
+#start=Thermometer.exe#
+#start=stepper_motor.exe#  
 
 INCLUDE biblioteca.txt
  
