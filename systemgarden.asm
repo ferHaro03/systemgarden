@@ -8,7 +8,8 @@
 #start=printer.exe#
 #start=emulation kit.exe#
 #start=Thermometer.exe#
-#start=stepper_motor.exe#  
+#start=stepper_motor.exe#
+#start=traffic_lights.exe#  
 
 INCLUDE biblioteca.txt
  
@@ -91,6 +92,8 @@ INCLUDE biblioteca.txt
     ; --- 6. VARIABLES PARA LOGS (ARCHIVOS) ---
     ; ====================================================
     file_log       db 'C:\SYSTGARD\FERNANDO\access.txt',0
+    file_log2       db 'C:\SYSTGARD\ENCISO\clima.txt',0
+    file_log3       db 'C:\SYSTGARD\ENCISO\alertas.txt',0
     handle_log     dw ?
     buffer_log     db 500 dup('$')       ; Buffer para cargar el texto del archivo
     

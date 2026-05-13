@@ -166,7 +166,9 @@ enviar_semaforo_e:
     RASTREO 
     
     
-    leer_opcion_clima_e:           
+    leer_opcion_clima_e:
+    CURSOR 22,68,0
+    RASTREO           
     CMP AL, '1'
     JE log_manual_e
     

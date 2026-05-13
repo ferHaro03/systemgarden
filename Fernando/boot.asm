@@ -91,7 +91,16 @@ ok_v:
     
     ; Crear archivo de sensores/estado
     CREAR_ARCHIVO file_sensores, 0
-    MOV handle_sens, AX
+    MOV handle_sens, AX      
+    
+    CREAR_ARCHIVO file_log2,0   
+    MOV handle_log, AX
+    CERRAR_ARCHIVO handle_log
+    
+    CREAR_ARCHIVO file_log3,0   
+    MOV handle_log, AX
+    CERRAR_ARCHIVO handle_log
+    
     
     ; Escribir valores iniciales por defecto
     ESCRIBIR_ARCHIVO handle_sens, 12, msg_temp
