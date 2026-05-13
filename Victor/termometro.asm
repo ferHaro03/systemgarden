@@ -121,13 +121,8 @@ MODULO_TERMOMETRO PROC
             ciclo:
             
             loop cicloMen
-            jmp interfaz_termometro
-                               
-<<<<<<< HEAD
-    finTermometro: 
-        ret
-=======
+            jmp interfaz_termometro  
+            
     finTermometro:
         RET 
->>>>>>> 293e6525288f81de799b8cb7ee0b5648cd390e37
 MODULO_TERMOMETRO ENDP
