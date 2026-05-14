@@ -46,7 +46,7 @@ ciclo_monitoreo:
     CMP val_temp_raw, 38
     JL clima_alerta_e         ; De 30 a 37 = alerta
     
-    JMP clima_critico_e       ; 38 o m·s = crÌtico
+    JMP clima_critico_e       ; 38 o m√°s = cr√≠tico
 
 clima_estable_e:
     MOV AL, 00000100b   
@@ -77,10 +77,10 @@ clima_critico_e:
 refrescar_hardware_e:
              
                
-    ; --- 1. ACTUALIZAR TRAFFIC LIGHTS SEG⁄N TEMPERATURA ---
+    ; --- 1. ACTUALIZAR TRAFFIC LIGHTS SEG√öN TEMPERATURA ---
     ; Verde    = temperatura estable
     ; Amarillo = temperatura en alerta
-    ; Rojo     = temperatura crÌtica
+    ; Rojo     = temperatura cr√≠tica
 
     PUSH AX
     PUSH DX
@@ -93,7 +93,7 @@ refrescar_hardware_e:
     CMP AL, 38
     JL semaforo_amarillo_e   ; De 30 a 37 = alerta
 
-    JMP semaforo_rojo_e      ; 38 o m·s = crÌtico
+    JMP semaforo_rojo_e      ; 38 o m√°s = cr√≠tico
 
 
 semaforo_verde_e:
@@ -122,7 +122,7 @@ enviar_semaforo_e:
     ; --- 2. ACTUALIZAR LED DISPLAY COMO NIVEL DE ESTADO ---
     ; 1 = estable
     ; 2 = alerta
-    ; 3 = crÌtico
+    ; 3 = cr√≠tico
 
     PUSH AX
     PUSH DX
@@ -149,7 +149,7 @@ enviar_semaforo_e:
     
     
     led_estado_critico_e:
-        MOV AX, 3                ; Nivel 3 = crÌtico
+        MOV AX, 3                ; Nivel 3 = cr√≠tico
         JMP enviar_led_estado_e
     
     
@@ -159,16 +159,14 @@ enviar_semaforo_e:
     
         POP DX
         POP AX
-     ; --- 3. MOSTRAR MEN⁄ ---
+     ; --- 3. MOSTRAR MEN√ö ---
     
     IMP_COLOR msj_clima_menu, 53, 0, 0, 22, 13, 0EH
     CURSOR 20, 68, 0
     RASTREO 
     
     
-    leer_opcion_clima_e:
-    CURSOR 22,68,0
-    RASTREO           
+    leer_opcion_clima_e:           
     CMP AL, '1'
     JE log_manual_e
     
@@ -190,13 +188,17 @@ log_manual_e:
      CALL OBTENER_HORA               
 
     CMP val_temp_raw, 30
-    JAE preparar_ruta_alerta     ; 30 o m·s = alerta/critico
+    JAE preparar_ruta_alerta     ; 30 o m√°s = alerta/critico
 
     JMP preparar_ruta_clima      ; menor a 30 = estable
 
 preparar_ruta_clima:
    
-   ; Contar registros actuales de clima.txt
+    ; Crear archivo si no existe
+    CREAR_ARCHIVO ruta_clima, 32
+    CLC
+
+    ; Ahora s√≠ contar registros actuales de clima.txt
     LEA DX, ruta_clima
     CALL CONTAR_REGISTROS_E
 
@@ -204,28 +206,23 @@ preparar_ruta_clima:
     JAE limite_registros_e
 
     ; Abrir archivo existente
-    MOV AH, 3Dh
-    LEA DX, ruta_clima
-    MOV AL, 2
-    INT 21h
-    JNC archivo_clima_abierto_e
-
-    ; Si no existe, crearlo
-    MOV AH, 3Ch
-    MOV CX, 32
-    LEA DX, ruta_clima
-    INT 21h
+    ABRIR_ARCHIVO ruta_clima, 2
     JC error_arc_e
 
-archivo_clima_abierto_e:
     MOV ID, AX
 
     CALL MOVER_PUNTERO_FINAL
-    ESCRIBIR_ARCHIVO ID, 22, msj_log_estable 
+    ESCRIBIR_ARCHIVO ID, 22, msj_log_estable
     JMP terminar_escritura_final
 
+
 preparar_ruta_alerta:
-     ; Contar registros actuales de alertas.txt
+    
+    ; Crear archivo si no existe
+    CREAR_ARCHIVO ruta_alertas, 32
+    CLC
+
+    ; Ahora s√≠ contar registros actuales de alertas.txt
     LEA DX, ruta_alertas
     CALL CONTAR_REGISTROS_E
 
@@ -233,25 +230,14 @@ preparar_ruta_alerta:
     JAE limite_registros_e
 
     ; Abrir archivo existente
-    MOV AH, 3Dh
-    LEA DX, ruta_alertas
-    MOV AL, 2
-    INT 21h
-    JNC archivo_alerta_abierto_e
-
-    ; Si no existe, crearlo
-    MOV AH, 3Ch
-    MOV CX, 32
-    LEA DX, ruta_alertas
-    INT 21h
+    ABRIR_ARCHIVO ruta_alertas, 2
     JC error_arc_e
 
-archivo_alerta_abierto_e:
     MOV ID, AX
 
     CALL MOVER_PUNTERO_FINAL
-    ESCRIBIR_ARCHIVO ID, 28, msj_log_alerta  
-    JMP terminar_escritura_final 
+    ESCRIBIR_ARCHIVO ID, 28, msj_log_alerta
+    JMP terminar_escritura_final
 
 terminar_escritura_final:
     ESCRIBIR_ARCHIVO ID, 5, hora_txt         
@@ -266,7 +252,8 @@ terminar_escritura_final:
     CURSOR 15, 18, 0
     IMP_SINCOLOR msj_reg_guardado
 
-    JMP leer_opcion_clima_e
+    RASTREO
+    JMP ciclo_monitoreo
     
 limite_registros_e:
     BORRAR_SECCION 07H, 13, 10, 18, 70
@@ -278,8 +265,13 @@ limite_registros_e:
     JMP MODULO_CLIMA
 
 error_arc_e:
-   
-    JMP ciclo_monitoreo
+    BORRAR_SECCION 07H, 13, 10, 18, 70
+
+    CURSOR 15, 16, 0
+    IMP_SINCOLOR msj_error_arc
+
+    RASTREO
+    JMP MODULO_CLIMA
 
 ver_historial_clima:
     PUSH DS
@@ -290,34 +282,41 @@ ver_historial_clima:
     REP STOSB
     
     BORRAR_SECCION 07H, 13, 10, 18, 70 
+
+    ; Verificar si clima.txt existe antes de abrirlo
+    LEA DX, ruta_clima
+    CALL EXISTE_ARCHIVO_E
+
+    CMP AL, 1
+    JNE archivo_vacio_e
     
+    ; Ahora s√≠ abrir archivo
     MOV AH, 3Dh
     LEA DX, ruta_clima
     MOV AL, 0
     INT 21h
-    JC error_lectura_real   
+    JC archivo_vacio_e   
     
     MOV ID, AX
     LEER_ARCHIVO ID, 400, buffer_clima
     
-    
-    MOV BX, AX              ; Guardamos en BX cu·ntos bytes leÌmos
-    CERRAR_ARCHIVO ID       ; AX se ensucia aquÌ
-    CMP BX, 0               ; Comparamos BX (el valor real de lectura)
-    
+    MOV BX, AX
+    CERRAR_ARCHIVO ID
 
+    CMP BX, 0
     JE archivo_vacio_e
 
     CURSOR 15, 20, 0
     IMP_SINCOLOR buffer_clima 
     
-    JMP leer_opcion_clima_e
+    RASTREO
+    JMP ciclo_monitoreo
     
 error_lectura_real:
     JMP archivo_vacio_e
     
 ver_historial_alertas: 
-    PUSH DS              
+      PUSH DS              
     POP ES
     MOV DI, OFFSET buffer_clima
     MOV CX, 400
@@ -326,34 +325,44 @@ ver_historial_alertas:
 
     BORRAR_SECCION 07H, 13, 10, 18, 70 
     IMP_COLOR msj_hist_alertas, 34, 0, 0, 13, 22, 0CH 
+
+    ; Verificar si alertas.txt existe antes de abrirlo
+    LEA DX, ruta_alertas
+    CALL EXISTE_ARCHIVO_E
+
+    CMP AL, 1
+    JNE archivo_vacio_e
     
+    ; Ahora s√≠ abrir archivo
     MOV AH, 3Dh
     LEA DX, ruta_alertas
     MOV AL, 0
     INT 21h
-    JC error_lectura_e
+    JC archivo_vacio_e
     
     MOV ID, AX                      
     LEER_ARCHIVO ID, 400, buffer_clima
     
-    
-    MOV BX, AX              ; Guardamos el conteo en BX
-    CERRAR_ARCHIVO ID       ; Cerramos el archivo
-    CMP BX, 0               ; Comparamos el conteo guardado
-    
+    MOV BX, AX
+    CERRAR_ARCHIVO ID
 
+    CMP BX, 0
     JE archivo_vacio_e
 
     CURSOR 15, 20, 0
     IMP_SINCOLOR buffer_clima 
+
     RASTREO
-    JMP leer_opcion_clima_e
+    JMP ciclo_monitoreo
     
 archivo_vacio_e:
+    BORRAR_SECCION 07H, 13, 10, 18, 70
+
     CURSOR 16, 18, 0
-    IMP_COLOR msj_vacio_e, 41, 0, 0, 16, 18, 0EH 
+    IMP_SINCOLOR msj_vacio_e
+
     RASTREO
-    JMP MODULO_CLIMA      
+    JMP ciclo_monitoreo      
     
 error_lectura_e:
     CURSOR 20, 20, 0
@@ -363,16 +372,9 @@ error_lectura_e:
     
 borrar_registros_e:
 
-    ; --- BORRAR FISICAMENTE clima.txt ---
-    MOV AH, 41h
-    LEA DX, ruta_clima
-    INT 21h
-    ; Si no existe, no importa. Se creara de nuevo.
-
-
-    ; --- CREAR clima.txt VACIO ---
+    ; --- VACIAR clima.txt ---
     MOV AH, 3Ch
-    MOV CX, 0
+    MOV CX, 32
     LEA DX, ruta_clima
     INT 21h
     JC error_borrar_registros_e
@@ -381,16 +383,9 @@ borrar_registros_e:
     CERRAR_ARCHIVO ID
 
 
-    ; --- BORRAR FISICAMENTE alertas.txt ---
-    MOV AH, 41h
-    LEA DX, ruta_alertas
-    INT 21h
-    ; Si no existe, no importa. Se creara de nuevo.
-
-
-    ; --- CREAR alertas.txt VACIO ---
+    ; --- VACIAR alertas.txt ---
     MOV AH, 3Ch
-    MOV CX, 0
+    MOV CX, 32
     LEA DX, ruta_alertas
     INT 21h
     JC error_borrar_registros_e
@@ -418,8 +413,8 @@ borrar_registros_e:
     CURSOR 15, 16, 0
     IMP_SINCOLOR msj_borrar_ok
 
-    JMP leer_opcion_clima_e
-
+    RASTREO
+    JMP ciclo_monitoreo
 
 error_borrar_registros_e:
     BORRAR_SECCION 07H, 13, 10, 18, 70
@@ -434,7 +429,43 @@ salir_clima_e:
     RET
 MODULO_CLIMA ENDP
 
-; --- SUBRUTINAS ---
+; --- SUBRUTINAS ---    
+
+EXISTE_ARCHIVO_E PROC
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    PUSH SI
+
+    ; Guardar la ruta que viene en DX
+    MOV SI, DX
+
+    ; Configurar DTA
+    MOV AH, 1Ah
+    LEA DX, dta_buffer_e
+    INT 21h
+
+    ; Buscar archivo sin abrirlo
+    MOV DX, SI
+    MOV AH, 4Eh
+    MOV CX, 32
+    INT 21h
+    JC archivo_no_existe_e
+
+    ; Si existe
+    MOV AL, 1
+    JMP fin_existe_archivo_e
+
+archivo_no_existe_e:
+    MOV AL, 0
+
+fin_existe_archivo_e:
+    POP SI
+    POP DX
+    POP CX
+    POP BX
+    RET
+EXISTE_ARCHIVO_E ENDP
 
 CONTAR_REGISTROS_E PROC
     PUSH AX
