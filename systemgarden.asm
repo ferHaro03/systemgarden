@@ -10,6 +10,7 @@
 #start=Thermometer.exe#
 #start=stepper_motor.exe#
 #start=traffic_lights.exe#  
+#start=LED_Display.exe#
 
 INCLUDE biblioteca.txt
  
