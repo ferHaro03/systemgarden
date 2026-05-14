@@ -249,6 +249,7 @@ INCLUDE biblioteca.txt
     ; Datos y Buffers
     temp_ascii       db '00', '$' 
     buffer_clima     db 400 dup('$') ; Capacidad para ~10 registros largos
+    dta_buffer_e db 43 dup(0)
     ; --- Limite de registros del historial ---
     MAX_REG_CLIMA     EQU 5
     contador_reg      db 0
